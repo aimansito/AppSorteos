@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sorteos Disponibles{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    .sorteo-list { list-style: none; padding: 0; }
+    .sorteo-list li { margin-bottom: 10px; border: 1px solid #ccc; padding: 10px; border-radius: 5px; }
+    .sorteo-actions { margin-top: 5px; }
+    .sorteo-actions a, .sorteo-actions button { margin-right: 5px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>¡Sorteos Disponibles! ✅</h1>
+
+    {% if app.user %}
+        <h3>Hola {{ app.user.username }}!</h3>
+        <a href="{{ path('app_logout') }}" class="logout-button">Cerrar Sesión</a>
+        <br>
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_sorteo_new') }}" class="btn btn-primary">Nuevo Sorteo</a>
+        {% endif %}
+    {% else %}
+        <a href="{{ path('app_login') }}" class="login-button">Iniciar Sesión</a>
+        <a href="{{ path('app_register') }}" class="login-button">Registrarse</a>
+    {% endif %}
+
+    {% if sorteos is empty %}
+        <p>No hay sorteos disponibles por ahora.</p>
+    {% else %}
+       <ul class="sorteo-list">
+    {% for sorteo in sorteos %}
+        <li>
+            <strong>{{ sorteo.nombreActividad }}</strong><br>
+            Fecha: {{ sorteo.fecha|date('d/m/Y H:i') }}<br>
+            Lugar: {{ sorteo.lugar }}<br>
+            Máx participantes: {{ sorteo.maxParticipantes }}<br>
+            Plazas restantes: {{ sorteo.getPlazasRestantes() }}<br>
+
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
+
+                <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres borrar este sorteo?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sorteo.id) }}">
+                    <button class="btn btn-danger">Borrar</button>
+                </form>
+            {% else %}
+                {% if sorteo.tienePlazasDisponibles() %}
+                    <a href="{{ path('app_sorteo_apuntarse', {'id': sorteo.id}) }}" class="btn btn-success">Unirse</a>
+                {% else %}
+                    <button class="btn btn-secondary" disabled>Completo</button>
+                {% endif %}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
+    {% endif %}
+</div>
+{% endblock %}

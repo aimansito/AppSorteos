@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Sorteo{% endblock %}
+
+{% block body %}
+    <h1>Create new Sorteo</h1>
+
+    {{ include('sorteo/_form.html.twig') }}
+
+   <h2><a href="{{ path('app_main') }}">Volver</a></h2>
+{% endblock %}

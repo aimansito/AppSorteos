@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sorteo{% endblock %}
+
+{% block body %}
+    <h2>Sorteo: {{ sorteo.nombreActividad }}</h2>
+<p>Fecha: {{ sorteo.fecha|date('d/m/Y H:i') }}</p>
+<p>Lugar: {{ sorteo.lugar }}</p>
+<p>Máx participantes: {{ sorteo.maxParticipantes }}</p>
+
+<h3>Participantes</h3>
+{% if participantes is empty %}
+    <p>No hay participantes aún.</p>
+{% else %}
+    <ul>
+        {% for participante in participantes %}
+            <li>
+                {{ participante.nombre }} - {{ participante.email }} - Código: {{ participante.codigoEntrada }} - Ganador: {{ participante.esGanador ? 'Sí' : 'No' }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+
+    <h2><a href="{{ path('app_main') }}">Volver</a></h2>
+{# <a href="{{ path('app_sorteo_edit', {'id': sorteo.id}) }}">edit</a> #}
+    
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Apuntarse al sorteo: {{ sorteo.nombreActividad }}</h1>
+
+{{ form_start(form) }}
+    {{ form_row(form.nombre) }}
+    {{ form_row(form.email) }}
+    {{ form_row(form.codigoEntrada) }}
+    <button type="submit">Apuntarse</button>
+{{ form_end(form) }}
+{% endblock %}
