@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ParticipanteRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Sorteo;
 
@@ -17,7 +18,10 @@ class Participante
     #[ORM\Column(length: 255)]
     private ?string $nombre = null;
 
+    
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "El correo electrónico es obligatorio.")]
+    #[Assert\Email(message: "El correo '{{ value }}' no es válido.")]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]

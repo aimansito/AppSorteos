@@ -15,13 +15,19 @@
     <ul>
         {% for participante in participantes %}
             <li>
-                {{ participante.nombre }} - {{ participante.email }} - Código: {{ participante.codigoEntrada }} - Ganador: {{ participante.esGanador ? 'Sí' : 'No' }}
+                {{ participante.nombre }} - {{ participante.email }} - Código: {{ participante.codigoEntrada }}
+                {% if participante.esGanador %}
+                    - <strong>GANADOR</strong>
+                {% else %}
+                    - No
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
 {% endif %}
 
 
+<h2><a href="{{ path('app_sorteo_sortear', {'id': sorteo.id}) }}" class="btn btn-success">Sortear</a></h2>
     <h2><a href="{{ path('app_main') }}">Volver</a></h2>
 {# <a href="{{ path('app_sorteo_edit', {'id': sorteo.id}) }}">edit</a> #}
     

@@ -36,7 +36,7 @@ class SorteoController extends AbstractController
             $em->persist($sorteo);
             $em->flush();
             $this->addFlash('success', 'Sorteo creado correctamente.');
-            return $this->redirectToRoute('app_sorteo_index');
+            return $this->redirectToRoute('app_main');
         }
 
         return $this->render('sorteo/new.html.twig', [
@@ -81,7 +81,7 @@ class SorteoController extends AbstractController
             $this->addFlash('success', 'Sorteo eliminado correctamente.');
         }
 
-        return $this->redirectToRoute('app_sorteo_index');
+        return $this->redirectToRoute('app_main');
     }
 
     #[Route('/{id}/apuntarse', name: 'app_sorteo_apuntarse', methods: ['GET', 'POST'])]
@@ -96,23 +96,28 @@ class SorteoController extends AbstractController
             // Validar plazas
             if (!$sorteo->tienePlazasDisponibles()) {
                 $this->addFlash('error', 'Lo sentimos, este sorteo ya está completo.');
-                return $this->redirectToRoute('app_sorteo_index');
+                return $this->redirectToRoute('app_sorteo_apuntarse', [
+                    'id' => $sorteo->getId()
+                 ]);
             }
 
             // Validar que el email no esté repetido en el mismo sorteo
             foreach ($sorteo->getParticipantes() as $p) {
                 if ($p->getEmail() === $participante->getEmail()) {
-                    $this->addFlash('warning', 'Ya estás apuntado a este sorteo.');
-                    return $this->redirectToRoute('app_sorteo_index');
+                 $this->addFlash('warning', 'Lo sentimos,ese email ya está apuntado en ese sorteo.');
+                 return $this->redirectToRoute('app_sorteo_apuntarse', [
+                    'id' => $sorteo->getId()
+                 ]);
                 }
-            }
+}
+
 
             $participante->setSorteo($sorteo);
             $em->persist($participante);
             $em->flush();
 
             $this->addFlash('success', 'Te has apuntado correctamente al sorteo.');
-            return $this->redirectToRoute('app_sorteo_index');
+            return $this->redirectToRoute('app_main');
         }
 
         return $this->render('participante/apuntarse.html.twig', [
@@ -120,4 +125,33 @@ class SorteoController extends AbstractController
             'sorteo' => $sorteo,
         ]);
     }
+
+    #[Route('/sorteo/{id}/sortear', name: 'app_sorteo_sortear')]
+public function sortear(Sorteo $sorteo, EntityManagerInterface $em): Response
+{
+    // 🔹 Aquí verificamos si ya hay un ganador
+    if ($sorteo->getParticipantes()->exists(fn($i, $p) => $p->isEsGanador())) {
+        $this->addFlash('warning', 'Ya hay un ganador en este sorteo.');
+        return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+    }
+
+    $participantes = $sorteo->getParticipantes()->toArray();
+
+    if (empty($participantes)) {
+        $this->addFlash('warning', 'No hay participantes en este sorteo.');
+        return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+    }
+
+    // Elegir un participante aleatorio
+    $ganador = $participantes[array_rand($participantes)];
+    $ganador->setEsGanador(true);
+
+    $em->flush();
+
+    $this->addFlash('success', '¡El ganador es '.$ganador->getNombre().'!');
+
+    return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+}
+
+
 }

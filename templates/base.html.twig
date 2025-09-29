@@ -12,10 +12,19 @@
         {% endblock %}
     </head>
     <body>
+    
+
+  {% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <script>
+            alert("{{ message|e('js') }}");
+        </script>
+    {% endfor %}
+{% endfor %}
 
 
+    {% block body %}{% endblock %}
 
-{% block body %}{% endblock %}
+</body>
 
-    </body>
 </html>
