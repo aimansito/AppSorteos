@@ -28,36 +28,38 @@
         <a href="{{ path('app_login') }}" class="login-button">Iniciar Sesión</a>
     {% endif %}
 
-    {% if sorteos is empty %}
+    {% set ahora = "now"|date("Y-m-d H:i:s") %}
+    {% set sorteosActivos = sorteos|filter(s => s.fecha > ahora) %}
+
+    {% if sorteosActivos is empty %}
         <p>No hay sorteos disponibles por ahora.</p>
     {% else %}
-       <ul class="sorteo-list">
-    {% for sorteo in sorteos %}
-        <li>
-            <strong>{{ sorteo.nombreActividad }}</strong><br>
-            Fecha: {{ sorteo.fecha|date('d/m/Y H:i') }}<br>
-            Lugar: {{ sorteo.lugar }}<br>
-            Máx participantes: {{ sorteo.maxParticipantes }}<br>
-            Plazas restantes: {{ sorteo.getPlazasRestantes() }}<br>
+        <ul class="sorteo-list">
+        {% for sorteo in sorteosActivos %}
+            <li>
+                <strong>{{ sorteo.nombreActividad }}</strong><br>
+                Fecha: {{ sorteo.fecha|date('d/m/Y H:i') }}<br>
+                Lugar: {{ sorteo.lugar }}<br>
+                Máx participantes: {{ sorteo.maxParticipantes }}<br>
+                Plazas restantes: {{ sorteo.getPlazasRestantes() }}<br>
 
-            {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
 
-                <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres borrar este sorteo?');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sorteo.id) }}">
-                    <button class="btn btn-danger">Borrar</button>
-                </form>
-            {% else %}
-                {% if sorteo.tienePlazasDisponibles() %}
-                    <a href="{{ path('app_sorteo_apuntarse', {'id': sorteo.id}) }}" class="btn btn-success">Unirse</a>
+                    <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres borrar este sorteo?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sorteo.id) }}">
+                        <button class="btn btn-danger">Borrar</button>
+                    </form>
                 {% else %}
-                   <h3 style="color: red;">Completo</h3>
+                    {% if sorteo.tienePlazasDisponibles() %}
+                        <a href="{{ path('app_sorteo_apuntarse', {'id': sorteo.id}) }}" class="btn btn-success">Unirse</a>
+                    {% else %}
+                        <h3 style="color: red;">Completo</h3>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        </li>
-    {% endfor %}
-</ul>
-
+            </li>
+        {% endfor %}
+        </ul>
     {% endif %}
 </div>
 {% endblock %}

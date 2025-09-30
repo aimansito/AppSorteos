@@ -16,28 +16,40 @@ class SorteoRepository extends ServiceEntityRepository
         parent::__construct($registry, Sorteo::class);
     }
 
-//    /**
-//     * @return Sorteo[] Returns an array of Sorteo objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findActivos(): array
+    {
+        $ahora = new \DateTime(); // Fecha y hora actual
+        return $this->createQueryBuilder('s')
+            ->where('s.fecha > :ahora')
+            ->setParameter('ahora', $ahora)
+            ->orderBy('s.fecha', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
-//    public function findOneBySomeField($value): ?Sorteo
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+
+    //    /**
+    //     * @return Sorteo[] Returns an array of Sorteo objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('s')
+    //            ->andWhere('s.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('s.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
+
+    //    public function findOneBySomeField($value): ?Sorteo
+    //    {
+    //        return $this->createQueryBuilder('s')
+    //            ->andWhere('s.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }
