@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Participante; // Asegúrate de importar Participante
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SorteoRepository::class)]
 class Sorteo
@@ -21,6 +22,7 @@ class Sorteo
     private ?string $nombreActividad = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\GreaterThanOrEqual("now", message: "La fecha del sorteo debe ser igual o posterior a la fecha actual.")]
     private ?\DateTimeInterface $fecha = null;
 
     #[ORM\Column(length: 255)]
