@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 
 #[Route('/sorteo')]
@@ -153,32 +155,66 @@ class SorteoController extends AbstractController
         ]);
     }
 
-    #[Route('/sorteo/{id}/sortear', name: 'app_sorteo_sortear')]
-    public function sortear(Sorteo $sorteo, EntityManagerInterface $em): Response
-    {
-        // 🔹 Aquí verificamos si ya hay un ganador
-        if ($sorteo->getParticipantes()->exists(fn($i, $p) => $p->isEsGanador())) {
-            $this->addFlash('warning', 'Ya hay un ganador en este sorteo.');
-            return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
-        }
+ 
 
-        $participantes = $sorteo->getParticipantes()->toArray();
-
-        if (empty($participantes)) {
-            $this->addFlash('warning', 'No hay participantes en este sorteo.');
-            return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
-        }
-
-        // Elegir un participante aleatorio
-        $ganador = $participantes[array_rand($participantes)];
-        $ganador->setEsGanador(true);
-
-        $em->flush();
-
-        $this->addFlash('success', '¡El ganador es ' . $ganador->getNombre() . '!');
-
+#[Route('/sorteo/{id}/sortear', name: 'app_sorteo_sortear')]
+public function sortear(Sorteo $sorteo, EntityManagerInterface $em, MailerInterface $mailer): Response
+{
+    // 🔹 Verificamos si ya hay un ganador
+    if ($sorteo->getParticipantes()->exists(fn($i, $p) => $p->isEsGanador())) {
+        $this->addFlash('warning', 'Ya hay un ganador en este sorteo.');
         return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
     }
+
+    $participantes = $sorteo->getParticipantes()->toArray();
+
+    if (empty($participantes)) {
+        $this->addFlash('warning', 'No hay participantes en este sorteo.');
+        return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+    }
+
+    // Elegir un participante aleatorio como ganador
+    $ganador = $participantes[array_rand($participantes)];
+    $ganador->setEsGanador(true);
+
+    $em->flush();
+
+    // ✅ Enviar correo al ganador
+    $emailGanador = (new Email())
+        ->from('soyelsorteosorteito@gmail.com')
+        ->to($ganador->getEmail())
+        ->subject('¡Felicidades, has ganado el sorteo!')
+        ->text('Hola '.$ganador->getNombre().', has ganado el sorteo "'.$sorteo->getNombreActividad().'". ¡Enhorabuena!');
+
+    try {
+        $mailer->send($emailGanador);
+    } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+        $this->addFlash('error', 'Error al enviar correo al ganador: ' . $e->getMessage());
+        return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+    }
+
+    // ✅ Enviar correo al resto de participantes
+    foreach ($participantes as $p) {
+        if ($p !== $ganador) {
+            $emailPerdedor = (new Email())
+                ->from('soyelsorteosorteito@gmail.com')
+                ->to($p->getEmail())
+                ->subject('Perdiste el sorteo')
+                ->text('Hola '.$p->getNombre().', lamentablemente no has ganado en el sorteo "'.$sorteo->getNombreActividad().'". ¡Gracias por participar!');
+
+            try {
+                $mailer->send($emailPerdedor);
+            } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                $this->addFlash('error', 'Error al enviar correo a '.$p->getEmail().': ' . $e->getMessage());
+            }
+        }
+    }
+
+    $this->addFlash('success', '¡El ganador ha sido notificado por correo!');
+
+    return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+}
+
 
 
 }
