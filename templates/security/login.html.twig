@@ -2,7 +2,30 @@
 
 {% block title %}Log in!{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .full-width-form-container {
+            max-width: 800px;
+            margin: 40px auto; 
+            padding: 20px;
+        }
+            
+        .form-check-input {
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5rem;
+        }
+        
+        .form-check-label {
+            padding-top: 2px;
+            font-size: 1.1rem;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
+<div class="full-width-form-container">
 <form method="post">
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -13,25 +36,28 @@
             You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
         </div>
     {% endif %}
+        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+        <label for="inputUsername">Username</label>
+        <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" autocomplete="username" required autofocus>
+        <label for="inputPassword">Password</label>
+        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
 
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputUsername">Username</label>
-    <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" autocomplete="username" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+    <input type="hidden" name="_csrf_token" data-controller="csrf-protection"
+        value="{{ csrf_token('authenticate') }}"
+    >
 
-   <input type="hidden" name="_csrf_token" data-controller="csrf-protection"
-       value="{{ csrf_token('authenticate') }}"
->
+        <div class="mb-3 mt-3"> 
+            <div class="form-check">
+                <input type="checkbox" name="_remember_me" id="remember_me_input" class="form-check-input"> 
+                <label class="form-check-label" for="remember_me_input"> 
+                    Remember me
+                </label>
+            </div>
+        </div>
 
-    <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" name="_remember_me"> Remember me
-        </label>
+        <button class="btn btn-lg btn-primary" type="submit">
+            Sign in
+        </button>
+    </form>
     </div>
-
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
-</form>
 {% endblock %}

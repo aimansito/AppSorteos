@@ -1,12 +1,4 @@
 {{ form_start(form) }}
-    {{ form_errors(form) }}
-    
-    {{ form_row(form.nombreActividad) }}
-    {{ form_row(form.fecha) }}
-    {{ form_row(form.lugar) }}
-    {{ form_row(form.maxParticipantes) }}
-
-    {# Si tienes campos que no quieres renderizar, puedes usar form_rest(form) al final, pero es mejor nombrarlos todos. #}
-    
-    <button class="btn">{{ button_label|default('Guardar') }}</button>
+    {{ form_widget(form) }}
+    <button class="btn">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}

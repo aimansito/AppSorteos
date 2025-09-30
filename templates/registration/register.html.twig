@@ -2,20 +2,101 @@
 
 {% block title %}Register{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .full-width-form-container {
+            max-width: 800px;
+            margin: 40px auto; 
+            padding: 20px;
+        }
+        
+        .form-control-yellow {
+            background-color: #ffffdd;
+            border-color: #a0c0ff;
+        }
+        
+        .btn-custom-blue {
+            background-color: #007bff;
+            border-color: #007bff;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+        }
+
+        .btn-custom-blue:hover,
+        .btn-custom-blue:focus,
+        .btn-custom-blue:active {
+            background-color: #007bff !important;
+            border-color: #007bff !important; 
+            box-shadow: none;
+        }
+        
+        .full-width-form-container h1 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-check-input {
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5rem;
+        }
+        
+        .form-check-label {
+            padding-top: 2px;
+            font-size: 1.1rem;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
-    <h1>Register</h1>
+    <div class="full-width-form-container">
+        <h1>Registro</h1>
+        <hr>
 
-    {{ form_errors(registrationForm) }}
+        {{ form_errors(registrationForm) }}
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.username) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+        {{ form_start(registrationForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+        
+            <div class="mb-3">
+                {{ form_row(registrationForm.username, {
+                    'attr': {'class': 'form-control form-control-lg form-control-yellow'}
+                }) }}
+            </div>
 
-        {{ form_row(registrationForm.isAdmin) }}
+            <div class="mb-3">
+                {{ form_row(registrationForm.plainPassword, {
+                    label: 'Password',
+                    'attr': {'class': 'form-control form-control-lg form-control-yellow'}
+                }) }}
+            </div>
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+            <div class="mb-3">
+                <div class="form-check">
+                    {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                    {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                </div>
+                {{ form_errors(registrationForm.agreeTerms) }}
+            </div>
+            
+            <div class="mb-4">
+                <div class="form-check">
+                    {{ form_widget(registrationForm.isAdmin, {
+                        'attr': {'class': 'form-check-input'}
+                    }) }}
+                    {{ form_label(registrationForm.isAdmin, 'Register as Admin', {
+                        'label_attr': {'class': 'form-check-label'}
+                    }) }}
+                </div>
+                {{ form_errors(registrationForm.isAdmin) }}
+            </div>
+
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-custom-blue btn-lg text-white">
+                    Register
+                </button>
+            </div>
+            
+        {{ form_end(registrationForm) }}
+    </div>
 {% endblock %}

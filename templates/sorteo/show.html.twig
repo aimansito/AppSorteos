@@ -1,34 +1,120 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Sorteo{% endblock %}
+{% block title %}Sorteo: {{ sorteo.nombreActividad }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .raffle-detail-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .raffle-subtitle {
+            color: #007bff; /* Azul claro para subtítulos */
+            border-bottom: 2px solid #a0c0ff; /* Línea azul debajo del subtítulo */
+            padding-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .raffle-info p {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .btn-sortear {
+            background-color: #28a745; 
+            border-color: #28a745;
+            font-size: 1.1rem;
+            padding: 10px 20px;
+            margin-right: 15px;
+        }
+        
+        .btn-sortear:hover,
+        .btn-sortear:focus,
+        .btn-sortear:active {
+            background-color: #1e7e34 !important; /* Un verde ligeramente más oscuro al pasar el ratón */
+            border-color: #1e7e34 !important;
+            box-shadow: none;
+        }
+
+        .winner-tag {
+            color: #d9534f; /* Rojo de Bootstrap para destacar */
+            font-weight: bold;
+            background-color: #fde8e8;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .action-buttons {
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <h2>Sorteo: {{ sorteo.nombreActividad }}</h2>
-<p>Fecha: {{ sorteo.fecha|date('d/m/Y H:i') }}</p>
-<p>Lugar: {{ sorteo.lugar }}</p>
-<p>Máx participantes: {{ sorteo.maxParticipantes }}</p>
+    <div class="raffle-detail-container">
 
-<h3>Participantes</h3>
-{% if participantes is empty %}
-    <p>No hay participantes aún.</p>
-{% else %}
-    <ul>
-        {% for participante in participantes %}
-            <li>
-                {{ participante.nombre }} - {{ participante.email }} - Código: {{ participante.codigoEntrada }}
-                {% if participante.esGanador %}
-                    - <strong>GANADOR</strong>
-                {% else %}
-                    - No
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
+        <h1>Detalles del Sorteo</h1>
+        <hr>
 
+        <div class="raffle-info mb-4">
+            <h2 class="raffle-subtitle">Sorteo: {{ sorteo.nombreActividad }}</h2>
+            <p><strong>Fecha:</strong> {{ sorteo.fecha|date('d/m/Y H:i') }}</p>
+            <p><strong>Lugar:</strong> {{ sorteo.lugar }}</p>
+            <p><strong>Máx participantes:</strong> {{ sorteo.maxParticipantes }}</p>
+        </div>
 
-<h2><a href="{{ path('app_sorteo_sortear', {'id': sorteo.id}) }}" class="btn btn-success">Sortear</a></h2>
-    <h2><a href="{{ path('app_main') }}">Volver</a></h2>
-{# <a href="{{ path('app_sorteo_edit', {'id': sorteo.id}) }}">edit</a> #}
-    
+        <h3 class="raffle-subtitle">Participantes ({{ participantes|length }})</h3>
+        
+        {% if participantes is empty %}
+            <p class="alert alert-info">No hay participantes aún.</p>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo Electrónico</th>
+                            <th>Código</th>
+                            <th class="text-center">Ganador</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for participante in participantes %}
+                            <tr>
+                                <td>{{ participante.nombre }}</td>
+                                <td><a href="mailto:{{ participante.email }}">{{ participante.email }}</a></td>
+                                <td><code class="text-muted">{{ participante.codigoEntrada }}</code></td>
+                                <td class="text-center">
+                                    {% if participante.esGanador %}
+                                        <span class="winner-tag">SÍ</span>
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        <div class="action-buttons">
+            <a href="{{ path('app_sorteo_sortear', {'id': sorteo.id}) }}" class="btn btn-lg btn-sortear text-white">
+                Sortear
+            </a>
+            <a href="{{ path('app_main') }}" class="btn btn-secondary btn-lg">
+                Volver
+            </a>
+        </div>
+        
+    </div>
 {% endblock %}

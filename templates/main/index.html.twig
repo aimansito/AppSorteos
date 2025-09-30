@@ -4,28 +4,200 @@
 
 {% block body %}
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-    .sorteo-list { list-style: none; padding: 0; }
-    .sorteo-list li { margin-bottom: 10px; border: 1px solid #ccc; padding: 10px; border-radius: 5px; }
-    .sorteo-actions { margin-top: 5px; }
-    .sorteo-actions a, .sorteo-actions button { margin-right: 5px; }
+    :root {
+        --primary-color: #3f51b5;
+        --accent-color: #ff9800;
+        --success-color: #4CAF50;
+        --danger-color: #F44336;
+        --info-color: #2196F3;
+        --background-light: #f7f9fc;
+        --text-dark: #333;
+        --border-color: #e0e0e0;
+    }
+
+    .example-wrapper {
+        margin: 2em auto;
+        max-width: 900px;
+        width: 90%;
+        font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: var(--text-dark);
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        color: var(--primary-color);
+        border-bottom: 3px solid var(--accent-color);
+        padding-bottom: 10px;
+        margin-bottom: 25px;
+        font-size: 2.2em;
+        font-weight: 500;
+    }
+
+    h3 {
+        color: var(--text-dark);
+        font-weight: 400;
+        margin-bottom: 15px;
+    }
+    
+    .user-controls {
+        margin-bottom: 25px;
+        padding: 15px;
+        background-color: #e8eaf6;
+        border-radius: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn, .logout-button, .login-button, .user-controls a {
+        display: inline-block;
+        padding: 8px 16px;
+        margin-right: 5px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+        border: none;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .btn:hover, .logout-button:hover, .login-button:hover, .user-controls a:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary, .login-button {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .btn-primary:hover, .login-button:hover {
+        background-color: #303f9f;
+    }
+
+    .logout-button {
+        background-color: #757575;
+        color: white;
+    }
+
+    .logout-button:hover {
+        background-color: #616161;
+    }
+
+    .btn-success {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    .btn-success:hover {
+        background-color: #43A047;
+    }
+
+    .btn-danger {
+        background-color: var(--danger-color);
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #E53935;
+    }
+
+    .btn-info {
+        background-color: var(--info-color);
+        color: white;
+    }
+
+    .btn-info:hover {
+        background-color: #1E88E5;
+    }
+
+    .sorteo-list {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        gap: 20px;
+    }
+
+    .sorteo-list li {
+        background: var(--background-light);
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 5px solid var(--primary-color);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s;
+        position: relative;
+    }
+
+    .sorteo-list li:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .sorteo-list strong {
+        font-size: 1.3em;
+        display: block;
+        margin-bottom: 8px;
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    .plazas-restantes {
+        font-weight: 600;
+        color: var(--accent-color);
+    }
+    
+    .sorteo-list li h3 {
+        color: var(--danger-color) !important;
+        font-weight: 600;
+        display: inline-block;
+        padding: 5px 10px;
+        border: 2px solid var(--danger-color);
+        border-radius: 5px;
+        margin: 0;
+    }
+
+    .example-wrapper p {
+        padding: 15px;
+        background-color: #fff3e0;
+        border: 1px solid #ffe0b2;
+        border-radius: 8px;
+        color: #e65100;
+        font-weight: 500;
+    }
+    
+    .sorteo-actions { 
+        margin-top: 15px; 
+    }
+    
+    .sorteo-actions form {
+        display: inline;
+    }
 </style>
 
 <div class="example-wrapper">
     <h1>¡Sorteos Disponibles! ✅</h1>
 
     {% if app.user %}
-        <h3>Hola {{ app.user.username }}!</h3>
-        <a href="{{ path('app_logout') }}" class="logout-button">Cerrar Sesión</a>
-        <br>
-        {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('app_sorteo_new') }}" class="btn btn-primary">Nuevo Sorteo</a>
+        <div class="user-controls">
+            <h3>Hola {{ app.user.username }}!</h3>
+            <a href="{{ path('app_logout') }}" class="logout-button">Cerrar Sesión</a>
             <br>
-            <a href="{{ path('app_register') }}" class="login-button">Añadir nuevo Admin</a>
-        {% endif %}
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_sorteo_new') }}" class="btn btn-primary">Nuevo Sorteo</a>
+                <br>
+                <a href="{{ path('app_register') }}" class="login-button">Añadir nuevo Admin</a>
+            {% endif %}
+        </div>
     {% else %}
-        <a href="{{ path('app_login') }}" class="login-button">Iniciar Sesión</a>
+        <div class="user-controls" style="justify-content: center; background-color: #e3f2fd;">
+            <a href="{{ path('app_login') }}" class="login-button">Iniciar Sesión</a>
+        </div>
     {% endif %}
 
     {% if sorteos is empty %}
@@ -38,22 +210,24 @@
             Fecha: {{ sorteo.fecha|date('d/m/Y H:i') }}<br>
             Lugar: {{ sorteo.lugar }}<br>
             Máx participantes: {{ sorteo.maxParticipantes }}<br>
-            Plazas restantes: {{ sorteo.getPlazasRestantes() }}<br>
+            Plazas restantes: <span class="plazas-restantes">{{ sorteo.getPlazasRestantes() }}</span><br>
 
-            {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
+            <div class="sorteo-actions">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
 
-                <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres borrar este sorteo?');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sorteo.id) }}">
-                    <button class="btn btn-danger">Borrar</button>
-                </form>
-            {% else %}
-                {% if sorteo.tienePlazasDisponibles() %}
-                    <a href="{{ path('app_sorteo_apuntarse', {'id': sorteo.id}) }}" class="btn btn-success">Unirse</a>
+                    <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres borrar este sorteo?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sorteo.id) }}">
+                        <button class="btn btn-danger">Borrar</button>
+                    </form>
                 {% else %}
-                   <h3 style="color: red;">Completo</h3>
+                    {% if sorteo.tienePlazasDisponibles() %}
+                        <a href="{{ path('app_sorteo_apuntarse', {'id': sorteo.id}) }}" class="btn btn-success">Unirse</a>
+                    {% else %}
+                       <h3 style="color: red;">Completo</h3>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
+            </div>
         </li>
     {% endfor %}
 </ul>
