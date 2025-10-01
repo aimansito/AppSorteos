@@ -16,19 +16,42 @@
             border-color: #a0c0ff;
         }
         
-        .btn-custom-blue {
-            background-color: #007bff;
-            border-color: #007bff;
-            padding: 10px 20px;
-            font-size: 1.1rem;
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-right: 5px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+            border: none;
+            text-align: center;
+            line-height: 1.5;
         }
 
-        .btn-custom-blue:hover,
-        .btn-custom-blue:focus,
-        .btn-custom-blue:active {
-            background-color: #303f9f !important; 
-            border-color: #007bff !important; 
-            box-shadow: none;
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-guardar {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-guardar:hover {
+            background-color: #43A047;
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            background-color: #757575;
+            color: white;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #616161;
         }
         
         .full-width-form-container h1 {
@@ -55,8 +78,5 @@
         <hr>
         {{ include('participante/_form.html.twig') }}
 
-        <div class="mt-4 text-center">
-            <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">Volver</a>
-        </div>
     </div>
 {% endblock %}

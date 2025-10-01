@@ -6,13 +6,15 @@ use App\Entity\Participante;
 use App\Form\ParticipanteType;
 use App\Repository\ParticipanteRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/participante')]
-final class ParticipanteController extends AbstractController{
+final class ParticipanteController extends AbstractController
+{
     #[Route(name: 'app_participante_index', methods: ['GET'])]
     public function index(ParticipanteRepository $participanteRepository): Response
     {
@@ -29,10 +31,15 @@ final class ParticipanteController extends AbstractController{
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($participante);
-            $entityManager->flush();
+            try {
+                $entityManager->persist($participante);
+                $entityManager->flush();
 
-            return $this->redirectToRoute('app_participante_index', [], Response::HTTP_SEE_OTHER);
+                $this->addFlash('success', 'Te has apuntado correctamente al sorteo.');
+                return $this->redirectToRoute('app_participante_index', [], Response::HTTP_SEE_OTHER);
+            } catch (UniqueConstraintViolationException $e) {
+                $this->addFlash('danger', 'Ya estás apuntado a este sorteo con este correo electrónico.');
+            }
         }
 
         return $this->render('participante/new.html.twig', [
@@ -56,9 +63,13 @@ final class ParticipanteController extends AbstractController{
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_participante_index', [], Response::HTTP_SEE_OTHER);
+            try {
+                $entityManager->flush();
+                $this->addFlash('success', 'El participante se actualizó correctamente.');
+                return $this->redirectToRoute('app_participante_index', [], Response::HTTP_SEE_OTHER);
+            } catch (UniqueConstraintViolationException $e) {
+                $this->addFlash('danger', 'Ya existe un participante con este email en el mismo sorteo.');
+            }
         }
 
         return $this->render('participante/edit.html.twig', [
@@ -73,6 +84,7 @@ final class ParticipanteController extends AbstractController{
         if ($this->isCsrfTokenValid('delete'.$participante->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($participante);
             $entityManager->flush();
+            $this->addFlash('success', 'El participante se eliminó correctamente.');
         }
 
         return $this->redirectToRoute('app_participante_index', [], Response::HTTP_SEE_OTHER);

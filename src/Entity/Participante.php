@@ -5,9 +5,14 @@ namespace App\Entity;
 use App\Repository\ParticipanteRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Entity\Sorteo;
 
 #[ORM\Entity(repositoryClass: ParticipanteRepository::class)]
+#[UniqueEntity(
+    fields: ['sorteo', 'email'],
+    message: 'Ya estás apuntado a este sorteo con este correo electrónico.'
+)]
 class Participante
 {
     #[ORM\Id]
@@ -18,7 +23,6 @@ class Participante
     #[ORM\Column(length: 255)]
     private ?string $nombre = null;
 
-    
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "El correo electrónico es obligatorio.")]
     #[Assert\Email(message: "El correo '{{ value }}' no es válido.")]
@@ -34,7 +38,6 @@ class Participante
     #[ORM\JoinColumn(nullable: false)]
     private ?Sorteo $sorteo = null;
 
-    // Getters y setters
     public function getId(): ?int
     {
         return $this->id;
