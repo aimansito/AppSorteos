@@ -42,7 +42,7 @@ class SorteoController extends AbstractController
             return $this->redirectToRoute('app_main');
         }
 
-        if($form->isSubmitted() && !$form->isValid()) {
+        if ($form->isSubmitted() && !$form->isValid()) {
             $this->addFlash('error', 'Error al crear el sorteo. La fecha y hora deben ser posteriores al momento actual');
             return $this->redirectToRoute('app_sorteo_new', [
                 'sorteo' => $sorteo
@@ -72,7 +72,7 @@ class SorteoController extends AbstractController
 
         if ($form->isSubmitted()) {
 
-            if(!$form->isValid()) {
+            if (!$form->isValid()) {
                 $this->addFlash('warning', 'Error al editar el sorteo. La fecha debe ser posterior a hoy');
                 return $this->render('sorteo/edit.html.twig', [
                     "sorteo" => $sorteo,
@@ -155,65 +155,65 @@ class SorteoController extends AbstractController
         ]);
     }
 
- 
 
-#[Route('/sorteo/{id}/sortear', name: 'app_sorteo_sortear')]
-public function sortear(Sorteo $sorteo, EntityManagerInterface $em, MailerInterface $mailer): Response
-{
-    // 🔹 Verificamos si ya hay un ganador
-    if ($sorteo->getParticipantes()->exists(fn($i, $p) => $p->isEsGanador())) {
-        $this->addFlash('warning', 'Ya hay un ganador en este sorteo.');
-        return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
-    }
 
-    $participantes = $sorteo->getParticipantes()->toArray();
+    #[Route('/sorteo/{id}/sortear', name: 'app_sorteo_sortear')]
+    public function sortear(Sorteo $sorteo, EntityManagerInterface $em, MailerInterface $mailer): Response
+    {
+        // 🔹 Verificamos si ya hay un ganador
+        if ($sorteo->getParticipantes()->exists(fn($i, $p) => $p->isEsGanador())) {
+            $this->addFlash('warning', 'Ya hay un ganador en este sorteo.');
+            return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+        }
 
-    if (empty($participantes)) {
-        $this->addFlash('warning', 'No hay participantes en este sorteo.');
-        return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
-    }
+        $participantes = $sorteo->getParticipantes()->toArray();
 
-    // Elegir un participante aleatorio como ganador
-    $ganador = $participantes[array_rand($participantes)];
-    $ganador->setEsGanador(true);
+        if (empty($participantes)) {
+            $this->addFlash('warning', 'No hay participantes en este sorteo.');
+            return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+        }
 
-    $em->flush();
+        // Elegir un participante aleatorio como ganador
+        $ganador = $participantes[array_rand($participantes)];
+        $ganador->setEsGanador(true);
 
-    // ✅ Enviar correo al ganador
-    $emailGanador = (new Email())
-        ->from('soyelsorteosorteito@gmail.com')
-        ->to($ganador->getEmail())
-        ->subject('¡Felicidades, has ganado el sorteo!')
-        ->text('Hola '.$ganador->getNombre().', has ganado el sorteo "'.$sorteo->getNombreActividad().'". ¡Enhorabuena!');
+        $em->flush();
 
-    try {
-        $mailer->send($emailGanador);
-    } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
-        $this->addFlash('error', 'Error al enviar correo al ganador: ' . $e->getMessage());
-        return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
-    }
+        // ✅ Enviar correo al ganador
+        $emailGanador = (new Email())
+            ->from('soyelsorteosorteito@gmail.com')
+            ->to($ganador->getEmail())
+            ->subject('¡Felicidades, has ganado el sorteo!')
+            ->text('Hola ' . $ganador->getNombre() . ', has ganado el sorteo "' . $sorteo->getNombreActividad() . '". ¡Enhorabuena!');
 
-    // ✅ Enviar correo al resto de participantes
-    foreach ($participantes as $p) {
-        if ($p !== $ganador) {
-            $emailPerdedor = (new Email())
-                ->from('soyelsorteosorteito@gmail.com')
-                ->to($p->getEmail())
-                ->subject('Perdiste el sorteo')
-                ->text('Hola '.$p->getNombre().', lamentablemente no has ganado en el sorteo "'.$sorteo->getNombreActividad().'". ¡Gracias por participar!');
+        try {
+            $mailer->send($emailGanador);
+        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+            $this->addFlash('error', 'Error al enviar correo al ganador: ' . $e->getMessage());
+            return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+        }
 
-            try {
-                $mailer->send($emailPerdedor);
-            } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
-                $this->addFlash('error', 'Error al enviar correo a '.$p->getEmail().': ' . $e->getMessage());
+        // ✅ Enviar correo al resto de participantes
+        foreach ($participantes as $p) {
+            if ($p !== $ganador) {
+                $emailPerdedor = (new Email())
+                    ->from('soyelsorteosorteito@gmail.com')
+                    ->to($p->getEmail())
+                    ->subject('Perdiste el sorteo')
+                    ->text('Hola ' . $p->getNombre() . ', lamentablemente no has ganado en el sorteo "' . $sorteo->getNombreActividad() . '". ¡Gracias por participar!');
+
+                try {
+                    $mailer->send($emailPerdedor);
+                } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+                    $this->addFlash('error', 'Error al enviar correo a ' . $p->getEmail() . ': ' . $e->getMessage());
+                }
             }
         }
+
+        $this->addFlash('success', '¡El ganador ha sido notificado por correo!');
+
+        return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
     }
-
-    $this->addFlash('success', '¡El ganador ha sido notificado por correo!');
-
-    return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
-}
 
 
 

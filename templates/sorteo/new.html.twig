@@ -1,11 +1,79 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Crear Sorteo{% endblock %}
+{% block title %}Crear Nuevo Sorteo{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+
+        .form-control-custom {
+            background-color: #fffdd;
+            border: 1px solid #ccc; 
+            padding: 10px 15px; 
+            border-radius: 8px; 
+            transition: all 0.2s;
+            box-shadow: none;
+        }
+
+        .form-control-custom:focus {
+             background-color: #fff; 
+             border-color: #4a90e2; /* Borde azul al enfocar */
+             box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.2);
+        }
+        
+        .btn-custom-blue {
+            background-color: #007bff; /* Azul primario */
+            border-color: #007bff;
+            font-size: 1.1rem; 
+            padding: 12px 25px; 
+            font-weight: 600;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+
+        .btn-custom-blue:hover,
+        .btn-custom-blue:focus,
+        .btn-custom-blue:active {
+            background-color: #0056b3 !important; 
+            border-color: #0056b3 !important; 
+        }
+        
+        .full-width-form-container h1 {
+            font-size: 2rem;
+            font-weight: 500; /* Peso normal/medio */
+            margin-bottom: 2rem;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .form-label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-check {
+            margin-bottom: 0.75rem;
+            padding-left: 0;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <h1>Crear Sorteo</h1>
+    <div class="full-width-form-container">
+        
+        <h1>Creación de Sorteo</h1>
 
-    {{ include('sorteo/_form.html.twig') }}
+        {{ include('sorteo/_form.html.twig') }}
 
-   <h2><a href="{{ path('app_main') }}">Volver</a></h2>
+        <div class="mt-4 text-center">
+            <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
+                Volver al Listado
+            </a>
+        </div>
+    </div>
 {% endblock %}

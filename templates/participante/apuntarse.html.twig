@@ -1,12 +1,62 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-<h1>Apuntarse al sorteo: {{ sorteo.nombreActividad }}</h1>
+{% block title %}Apuntarse al Sorteo{% endblock %}
 
-{{ form_start(form) }}
-    {{ form_row(form.nombre) }}
-    {{ form_row(form.email) }}
-    {{ form_row(form.codigoEntrada) }}
-    <button type="submit">Apuntarse</button>
-{{ form_end(form) }}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .full-width-form-container {
+            max-width: 800px;
+            margin: 40px auto; 
+            padding: 20px;
+        }
+        
+        .form-control-yellow {
+            background-color: #ffffdd;
+            border-color: #a0c0ff;
+        }
+        
+        .btn-custom-blue {
+            background-color: #007bff;
+            border-color: #007bff;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+        }
+
+        .btn-custom-blue:hover,
+        .btn-custom-blue:focus,
+        .btn-custom-blue:active {
+            background-color: #303f9f !important; 
+            border-color: #007bff !important; 
+            box-shadow: none;
+        }
+        
+        .full-width-form-container h1 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-check-input {
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5rem;
+        }
+        
+        .form-check-label {
+            padding-top: 2px;
+            font-size: 1.1rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="full-width-form-container">
+        <h1>Apuntarse al Sorteo</h1>
+        <hr>
+        {{ include('sorteo/_form.html.twig') }}
+
+        <div class="mt-4 text-center">
+            <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">Volver</a>
+        </div>
+    </div>
 {% endblock %}
