@@ -5,6 +5,11 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        h1{
+            font-size: 2.2em;
+            font-weight: 500;
+            text-align: center;
+        }
         .full-width-form-container {
             max-width: 800px;
             margin: 40px auto; 
@@ -50,7 +55,10 @@
 {% endblock %}
 
 {% block body %}
-    <div class="full-width-form-container">
+
+ {% if is_granted('ROLE_ADMIN') %}
+             
+     <div class="full-width-form-container">
         <h1>Registro</h1>
         <hr>
 
@@ -89,4 +97,18 @@
             
         {{ form_end(registrationForm) }}
     </div>
+
+
+
+        </div>
+            {% else %}
+
+            <h1>Necesitas permisos de Administrador</h1>
+               
+         {% endif %}
+
+
+
+
+   
 {% endblock %}
