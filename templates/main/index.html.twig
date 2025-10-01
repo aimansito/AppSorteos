@@ -178,25 +178,34 @@
     .sorteo-actions form {
         display: inline;
     }
+    h1{
+        font-size: 2.2em;
+        font-weight: 500;
+        text-align: center;
+    }
 </style>
 
 <div class="example-wrapper">
-    <h1>¡Sorteos Disponibles! ✅</h1>
+    <h1>Sorteos Disponibles</h1>
 
     {% if app.user %}
         <div class="user-controls">
             <h3>Hola {{ app.user.username }}!</h3>
-            <a href="{{ path('app_logout') }}" class="logout-button">Cerrar Sesión</a>
-            <br>
-            {% if is_granted('ROLE_ADMIN') %}
+            <div>
+                <a href="{{ path('app_logout') }}" class="logout-button">Cerrar Sesión</a>
+            
+            
                 <a href="{{ path('app_sorteo_new') }}" class="btn btn-primary">Nuevo Sorteo</a>
-                <br>
-                <a href="{{ path('app_register') }}" class="login-button">Añadir nuevo Admin</a>
-            {% endif %}
+                
+                <a href="{{ path('app_register') }}" class="btn btn-primary">Añadir nuevo Admin</a>
+           
+
+            </div>
+            
         </div>
     {% else %}
         <div class="user-controls" style="justify-content: center; background-color: #e3f2fd;">
-            <a href="{{ path('app_login') }}" class="login-button">Iniciar Sesión</a>
+            <a href="{{ path('app_login') }}" class="login-button">Iniciar Sesión Administrador</a>
         </div>
     {% endif %}
 
@@ -216,6 +225,7 @@
             Plazas restantes: {{ sorteo.getPlazasRestantes() }}<br>
 
             {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_sorteo_apuntarse', {'id': sorteo.id}) }}" class="btn btn-success">Unirse</a>
                 <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
 
                 <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres borrar este sorteo?');">

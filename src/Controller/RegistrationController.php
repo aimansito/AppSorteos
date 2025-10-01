@@ -33,15 +33,10 @@ class RegistrationController extends AbstractController
             // encode the plain password
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
-            // Check if the isAdmin checkbox was checked
-            $isAdmin = $form->get('isAdmin')->getData();
-
-            // Set the user's roles based on the checkbox value
-            if ($isAdmin) {
-                $user->setRoles(['ROLE_ADMIN']);
-            } else {
-                $user->setRoles([]);
-            }
+           
+            
+            $user->setRoles(['ROLE_ADMIN']);
+            
 
             $entityManager->persist($user);
             $entityManager->flush();

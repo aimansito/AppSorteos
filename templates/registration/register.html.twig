@@ -66,7 +66,7 @@
 
             <div class="mb-3">
                 {{ form_row(registrationForm.plainPassword, {
-                    label: 'Password',
+                    label: 'Contraseña',
                     'attr': {'class': 'form-control form-control-lg form-control-yellow'}
                 }) }}
             </div>
@@ -79,21 +79,11 @@
                 {{ form_errors(registrationForm.agreeTerms) }}
             </div>
             
-            <div class="mb-4">
-                <div class="form-check">
-                    {{ form_widget(registrationForm.isAdmin, {
-                        'attr': {'class': 'form-check-input'}
-                    }) }}
-                    {{ form_label(registrationForm.isAdmin, 'Register as Admin', {
-                        'label_attr': {'class': 'form-check-label'}
-                    }) }}
-                </div>
-                {{ form_errors(registrationForm.isAdmin) }}
-            </div>
+           
 
             <div class="d-grid mt-4">
                 <button type="submit" class="btn btn-custom-blue btn-lg text-white">
-                    Register
+                    Registrarse
                 </button>
             </div>
             
