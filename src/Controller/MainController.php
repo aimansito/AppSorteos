@@ -12,7 +12,7 @@ class MainController extends AbstractController
     #[Route('/', name: 'app_main')]
     public function index(SorteoRepository $sorteoRepository): Response
     {
-        // Trae todos los sorteos activos
+        
         $sorteos = $sorteoRepository->findActivos();
 
         return $this->render('main/index.html.twig', [

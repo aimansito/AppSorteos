@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Sorteo;
 use App\Entity\Participante;
 use App\Form\SorteoType;
-use App\Form\ParticipanteType;   // ⬅️ AÑADE ESTA IMPORTACIÓN
+use App\Form\ParticipanteType;   
 use App\Repository\SorteoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -106,13 +106,13 @@ class SorteoController extends AbstractController
     #[Route('/{id}/apuntarse', name: 'app_sorteo_apuntarse', methods: ['GET', 'POST'])]
     public function apuntarse(Sorteo $sorteo, EntityManagerInterface $em, Request $request): Response
     {
-        // Crear formulario de participante (nombre/email)
+       
         $participante = new Participante();
         $form = $this->createForm(ParticipanteType::class, $participante);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Validar plazas
+            
             if (!$sorteo->tienePlazasDisponibles()) {
                 $this->addFlash('error', 'Lo sentimos, este sorteo ya está completo.');
                 return $this->redirectToRoute('app_sorteo_apuntarse', [
@@ -120,7 +120,7 @@ class SorteoController extends AbstractController
                 ]);
             }
 
-            // Validar que el email no esté repetido en el mismo sorteo
+          
             foreach ($sorteo->getParticipantes() as $p) {
                 if ($p->getEmail() === $participante->getEmail()) {
                     $this->addFlash('warning', 'Lo sentimos, ese email ya está apuntado en ese sorteo.');
@@ -130,7 +130,7 @@ class SorteoController extends AbstractController
                 }
             }
 
-            // Validar que el código de entrada sea único en el mismo sorteo
+           
             foreach ($sorteo->getParticipantes() as $p) {
                 if ($p->getCodigoEntrada() === $participante->getCodigoEntrada()) {
                     $this->addFlash('warning', 'Lo sentimos, ese código de entrada ya está apuntado en ese sorteo.');
@@ -160,7 +160,7 @@ class SorteoController extends AbstractController
     #[Route('/sorteo/{id}/sortear', name: 'app_sorteo_sortear')]
     public function sortear(Sorteo $sorteo, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
-        // 🔹 Verificamos si ya hay un ganador
+        
         if ($sorteo->getParticipantes()->exists(fn($i, $p) => $p->isEsGanador())) {
             $this->addFlash('warning', 'Ya hay un ganador en este sorteo.');
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
@@ -173,13 +173,13 @@ class SorteoController extends AbstractController
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
-        // Elegir un participante aleatorio como ganador
+       
         $ganador = $participantes[array_rand($participantes)];
         $ganador->setEsGanador(true);
 
         $em->flush();
 
-        // ✅ Enviar correo al ganador
+       
         $emailGanador = (new Email())
             ->from('soyelsorteosorteito@gmail.com')
             ->to($ganador->getEmail())
@@ -193,7 +193,7 @@ class SorteoController extends AbstractController
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
-        // ✅ Enviar correo al resto de participantes
+        
         foreach ($participantes as $p) {
             if ($p !== $ganador) {
                 $emailPerdedor = (new Email())
