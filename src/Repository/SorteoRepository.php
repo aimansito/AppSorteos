@@ -18,7 +18,7 @@ class SorteoRepository extends ServiceEntityRepository
 
     public function findActivos(): array
     {
-        $ahora = new \DateTime(); // Fecha y hora actual
+        $ahora = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Madrid')); // Fecha y hora actual en España
         return $this->createQueryBuilder('s')
             ->where('s.fecha > :ahora')
             ->setParameter('ahora', $ahora)
