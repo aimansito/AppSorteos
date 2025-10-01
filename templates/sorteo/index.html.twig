@@ -1,19 +1,43 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Sorteo index{% endblock %}
+{% block title %}Sorteo{% endblock %}
 
 {% block body %}
-    <h1>Sorteo index</h1>
+    <style>
+        .a-last-child {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-right: 5px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+            border: none;
+            text-align: center;
+            line-height: 1.5;
+            background-color: #3f51b5;
+            color: white;
+        }
+
+        .a-last-child:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);   
+            background-color: #303f9f;
+        }
+    </style>
+
+    <h1>Sorteo</h1>
 
     <table class="table">
         <thead>
             <tr>
                 <th>Id</th>
-                <th>NombreActividad</th>
+                <th>Actividad</th>
                 <th>Fecha</th>
                 <th>Lugar</th>
-                <th>MaxParticipantes</th>
-                <th>actions</th>
+                <th>Max Participantes</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -25,17 +49,17 @@
                 <td>{{ sorteo.lugar }}</td>
                 <td>{{ sorteo.maxParticipantes }}</td>
                 <td>
-                    <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}">show</a>
-                    <a href="{{ path('app_sorteo_edit', {'id': sorteo.id}) }}">edit</a>
+                    <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}">Mostrar</a>
+                    <a href="{{ path('app_sorteo_edit', {'id': sorteo.id}) }}">Editar</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">no records found</td>
+                <td colspan="6">No hay datos disponibles</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_sorteo_new') }}">Create new</a>
+    <a href="{{ path('app_sorteo_new') }}" class="a-last-child">Crear Sorteo</a>
 {% endblock %}

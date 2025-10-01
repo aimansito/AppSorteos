@@ -1,9 +1,33 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Participante index{% endblock %}
+{% block title %}Participante{% endblock %}
 
 {% block body %}
-    <h1>Participante index</h1>
+    <style>
+        .a-last-child {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-right: 5px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+            border: none;
+            text-align: center;
+            line-height: 1.5;
+            background-color: #3f51b5;
+            color: white;
+        }
+
+        .a-last-child:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);   
+            background-color: #303f9f;
+        }
+    </style>
+
+    <h1>Participante</h1>
 
     <table class="table">
         <thead>
@@ -11,9 +35,9 @@
                 <th>Id</th>
                 <th>Nombre</th>
                 <th>Email</th>
-                <th>CodigoEntrada</th>
-                <th>EsGanador</th>
-                <th>actions</th>
+                <th>Código de Entrada</th>
+                <th>Ganador</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -23,19 +47,19 @@
                 <td>{{ participante.nombre }}</td>
                 <td>{{ participante.email }}</td>
                 <td>{{ participante.codigoEntrada }}</td>
-                <td>{{ participante.esGanador ? 'Yes' : 'No' }}</td>
+                <td>{{ participante.esGanador ? 'Sí' : 'No' }}</td>
                 <td>
-                    <a href="{{ path('app_participante_show', {'id': participante.id}) }}">show</a>
-                    <a href="{{ path('app_participante_edit', {'id': participante.id}) }}">edit</a>
+                    <a href="{{ path('app_participante_show', {'id': participante.id}) }}">Mostrar</a>
+                    <a href="{{ path('app_participante_edit', {'id': participante.id}) }}">Editar</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">no records found</td>
+                <td colspan="6">No hay datos disponibles</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_participante_new') }}">Create new</a>
+    <a href="{{ path('app_participante_new') }}" class="a-last-child">Crear Usuario</a>
 {% endblock %}

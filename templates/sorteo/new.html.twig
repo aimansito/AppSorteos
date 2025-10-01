@@ -5,60 +5,78 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        h1{
-            font-size: 2.2em;
-            font-weight: 500;
-            text-align: center;
-        }
 
         .form-control-custom {
             background-color: #ffffdd;
-            border: 1px solid #ccc; 
             padding: 10px 15px; 
             border-radius: 8px; 
             transition: all 0.2s;
             box-shadow: none;
         }
 
-        .form-control-custom:focus {
-             background-color: #fff; 
-             border-color: #4a90e2; 
-             box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.2);
-        }
-        
-        .btn-custom-blue {
-            background-color: #007bff; 
-            border-color: #007bff;
-            font-size: 1.1rem; 
-            padding: 12px 25px; 
-            font-weight: 600;
-            border-radius: 8px;
-            transition: background-color 0.2s;
-            width: 100%;
-        }
-
-        .btn-custom-blue:hover,
-        .btn-custom-blue:focus,
-        .btn-custom-blue:active {
-            background-color: #0056b3 !important; 
-            border-color: #0056b3 !important; 
+        .full-width-form-container {
+            max-width: 800px;
+            margin: 40px auto; 
+            padding: 20px;
         }
         
         .full-width-form-container h1 {
             font-size: 2rem;
-            font-weight: 500; 
-            margin-bottom: 2rem;
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            margin-bottom: 1.5rem;
         }
 
-        .form-label {
-            font-size: 1rem;
+        .form-check-input {
+            width: 1.25em;
+            height: 1.25em;
+            margin-right: 0.5rem;
+        }
+        
+        .form-check-label {
+            padding-top: 2px;
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-right: 5px;
+            border-radius: 6px;
+            text-decoration: none;
             font-weight: 500;
-            color: #555;
-            margin-bottom: 0.5rem;
-            display: block;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+            border: none;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-guardar {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-guardar:hover {
+            background-color: #43A047;
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            background-color: #757575;
+            color: white;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #616161;
+        }
+
+        .form-control-custom:focus {
+             background-color: #fff; 
+             border-color: #4a90e2;
         }
 
         .form-check {
@@ -70,24 +88,18 @@
 
 {% block body %}
     <div class="full-width-form-container">
-        
         {% if is_granted('ROLE_ADMIN') %}
-              <h1>Creación de Sorteo</h1>
+            
+            
+            <h1>Creación del Sorteo</h1>
 
-        {{ include('sorteo/_form.html.twig') }}
-
-        <div class="mt-4 text-center">
+            {{ include('sorteo/_form.html.twig') }}
+        
+        {% else %}
+            <h1>Necesitas permisos de Administrador</h1>
             <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
                 Volver al Listado
             </a>
-        </div>
-            {% else %}
-
-            <h1>Necesitas permisos de Administrador</h1>
-               
-         {% endif %}
-
-
-       
+        {% endif %}
     </div>
 {% endblock %}

@@ -1,13 +1,73 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Participante{% endblock %}
+{% block title %}Editar Participante{% endblock %}
 
 {% block body %}
-    <h1>Edit Participante</h1>
 
-    {{ include('participante/_form.html.twig', {'button_label': 'Update'}) }}
+    <style>
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-right: 5px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+            border: none;
+            text-align: center;
+            line-height: 1.5;
+        }
 
-    <a href="{{ path('app_participante_index') }}">back to list</a>
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);   
+        }
 
-    {{ include('participante/_delete_form.html.twig') }}
+        .btn-guardar {
+            background-color: #3f51b5;
+            color: white;
+        }
+
+        .btn-guardar:hover {
+            background-color: #303f9f;
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            background-color: #757575;
+            color: white;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #616161;
+        }
+        
+    </style>
+
+    {% if is_granted('ROLE_ADMIN') %}
+
+        <h1>Editar Participante</h1>
+
+        <div class="mt-4">
+            {{ include('participante/_form.html.twig') }}
+
+            <button type="submit" class="btn btn-guardar d-inline">
+                {{ button_label|default('Guardar Participante') }}
+            </button>
+
+            <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
+                Volver al Listado
+            </a>
+
+            {{ include('participante/_delete_form.html.twig') }}
+        </div>
+
+        
+    {% else %}
+        <h1>Necesitas permisos de Administrador</h1>
+        <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
+            Volver al Listado
+        </a>
+    {% endif %}
 {% endblock %}
