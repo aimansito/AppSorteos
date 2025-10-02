@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Participante; // Asegúrate de importar Participante
+use App\Entity\Participante;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SorteoRepository::class)]
@@ -112,7 +112,6 @@ class Sorteo
     public function removeParticipante(Participante $participante): static
     {
         if ($this->participantes->removeElement($participante)) {
-            // set the owning side to null (unless already changed)
             if ($participante->getSorteo() === $this) {
                 $participante->setSorteo(null);
             }

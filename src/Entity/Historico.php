@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\Repository\HistoricoRepository;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\User;
+use App\Entity\Participante;
 use App\Entity\Sorteo;
 
 #[ORM\Entity(repositoryClass: HistoricoRepository::class)]
@@ -21,9 +21,9 @@ class Historico
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $fecha = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: Participante::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $ganador = null;
+    private ?Participante $ganador = null;
 
     #[ORM\ManyToOne(targetEntity: Sorteo::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -58,12 +58,12 @@ class Historico
         return $this;
     }
 
-    public function getGanador(): ?User
+    public function getGanador(): ?Participante
     {
         return $this->ganador;
     }
 
-    public function setGanador(?User $ganador): static
+    public function setGanador(?Participante $ganador): static
     {
         $this->ganador = $ganador;
         return $this;

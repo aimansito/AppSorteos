@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Historico;
 use App\Entity\Sorteo;
 use App\Entity\Participante;
 use App\Form\SorteoType;
 use App\Form\ParticipanteType;
 use App\Repository\SorteoRepository;
+use DateTimeImmutable;
+use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -162,6 +165,14 @@ class SorteoController extends AbstractController
 
         $ganador = $participantes[array_rand($participantes)];
         $ganador->setEsGanador(true);
+
+        $historico = new Historico();
+        $historico->setSorteo($sorteo);
+        $historico->setFecha(new DateTimeImmutable("now", new DateTimeZone("Europe/Madrid")));
+        $historico->setGanador($ganador);
+        $historico->setNombreActividad($sorteo->getNombreActividad());
+
+        $em->persist($historico);
 
         $em->flush();
 

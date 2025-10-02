@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Histórico de Sorteos{% endblock %}
+
+{% block body %}
+    <style>
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-right: 5px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+            border: none;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline-secondary {
+            background-color: #757575;
+            color: white;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #616161;
+        }
+    </style>
+    <h1>Histórico de Sorteos Realizados</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Sorteo</th>
+                <th>Ganador</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for historico in historicos %}
+            <tr>
+                <td>{{ historico.fecha ? historico.fecha|date('Y-m-d H:i:s') : '' }}</td>
+                
+                <td>{{ historico.sorteo.nombreActividad ?? historico.nombreActividad }}</td> 
+                
+                <td>{{ historico.ganador.nombre ?? 'N/A' }} ({{ historico.ganador.email ?? 'N/A' }})</td> 
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">No hay registros históricos.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
+        Volver al Listado
+    </a>
+{% endblock %}
