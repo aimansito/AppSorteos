@@ -6,7 +6,6 @@ use App\Entity\Historico;
 use App\Entity\Sorteo;
 use App\Entity\Participante;
 use App\Form\SorteoType;
-use App\Form\ParticipanteType;
 use App\Repository\SorteoRepository;
 use DateTimeImmutable;
 use DateTimeZone;
@@ -18,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
-
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 #[Route('/sorteo')]
 class SorteoController extends AbstractController
@@ -47,9 +46,7 @@ class SorteoController extends AbstractController
 
         if ($form->isSubmitted() && !$form->isValid()) {
             $this->addFlash('error', 'Error al crear el sorteo. La fecha y hora deben ser posteriores al momento actual');
-            return $this->redirectToRoute('app_sorteo_new', [
-                'sorteo' => $sorteo
-            ]);
+            return $this->redirectToRoute('app_sorteo_new');
         }
 
         return $this->render('sorteo/new.html.twig', [
@@ -68,13 +65,12 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_sorteo_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Sorteo $sorteo, EntityManagerInterface $em, ValidatorInterface $validator): Response
+    public function edit(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(SorteoType::class, $sorteo);
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-
             if (!$form->isValid()) {
                 $this->addFlash('warning', 'Error al editar el sorteo. La fecha debe ser posterior a hoy');
                 return $this->render('sorteo/edit.html.twig', [
@@ -143,13 +139,16 @@ class SorteoController extends AbstractController
         ]);
     }
 
-
-
-
-    #[Route('/sorteo/{id}/sortear', name: 'app_sorteo_sortear')]
-    public function sortear(Sorteo $sorteo, EntityManagerInterface $em, MailerInterface $mailer): Response
+    #[Route('/{id}/sortear', name: 'app_sorteo_sortear', methods: ['POST'])]
+    public function sortear(Request $request, Sorteo $sorteo, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
+        // CSRF
+        if (!$this->isCsrfTokenValid('sortear'.$sorteo->getId(), $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF inválido.');
+            return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+        }
 
+        // Si ya tiene ganador
         if ($sorteo->getParticipantes()->exists(fn($i, $p) => $p->isEsGanador())) {
             $this->addFlash('warning', 'Ya hay un ganador en este sorteo.');
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
@@ -162,7 +161,7 @@ class SorteoController extends AbstractController
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
-
+        // Ganador aleatorio
         $ganador = $participantes[array_rand($participantes)];
         $ganador->setEsGanador(true);
 
@@ -173,41 +172,40 @@ class SorteoController extends AbstractController
         $historico->setNombreActividad($sorteo->getNombreActividad());
 
         $em->persist($historico);
-
         $em->flush();
 
+        $from = $_ENV['MAILER_FROM'] ?? 'no-reply@tusitio.es';
 
-        $emailGanador = (new Email())
-            ->from('soyelsorteosorteito@gmail.com')
-            ->to($ganador->getEmail())
-            ->subject('¡Felicidades, has ganado el sorteo!')
-            ->text('Hola ' . $ganador->getNombre() . ', has ganado el sorteo "' . $sorteo->getNombreActividad() . '". ¡Enhorabuena!');
-
+        // Email ganador
         try {
+            $emailGanador = (new Email())
+                ->from($from)
+                ->to($ganador->getEmail())
+                ->subject('¡Felicidades, has ganado el sorteo!')
+                ->text("Hola {$ganador->getNombre()},\n\nHas ganado el sorteo \"{$sorteo->getNombreActividad()}\".\n¡Enhorabuena!");
+
             $mailer->send($emailGanador);
-        } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
+        } catch (TransportExceptionInterface $e) {
             $this->addFlash('error', 'Error al enviar correo al ganador: ' . $e->getMessage());
-            return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
-
+        // Emails a perdedores
         foreach ($participantes as $p) {
             if ($p !== $ganador) {
-                $emailPerdedor = (new Email())
-                    ->from('soyelsorteosorteito@gmail.com')
-                    ->to($p->getEmail())
-                    ->subject('Perdiste el sorteo')
-                    ->text('Hola ' . $p->getNombre() . ', lamentablemente no has ganado en el sorteo "' . $sorteo->getNombreActividad() . '". ¡Gracias por participar!');
-
                 try {
+                    $emailPerdedor = (new Email())
+                        ->from($from)
+                        ->to($p->getEmail())
+                        ->subject('Resultado del sorteo')
+                        ->text("Hola {$p->getNombre()},\n\nEl sorteo \"{$sorteo->getNombreActividad()}\" ya tiene ganador. ¡Gracias por participar!");
                     $mailer->send($emailPerdedor);
-                } catch (\Symfony\Component\Mailer\Exception\TransportExceptionInterface $e) {
-                    $this->addFlash('error', 'Error al enviar correo a ' . $p->getEmail() . ': ' . $e->getMessage());
+                } catch (TransportExceptionInterface $e) {
+                    $this->addFlash('error', 'Error al enviar correo a '.$p->getEmail().': '.$e->getMessage());
                 }
             }
         }
 
-        $this->addFlash('success', '¡El ganador ha sido notificado por correo!');
+        $this->addFlash('success', '¡El sorteo se ha realizado y los participantes han sido notificados!');
 
         return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
     }

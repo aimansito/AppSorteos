@@ -20,7 +20,7 @@
 
         .btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);   
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .btn-editar {
@@ -33,6 +33,16 @@
             color: white;
         }
 
+        .btn-eliminar {
+            background-color: #e53935;
+            color: white;
+        }
+
+        .btn-eliminar:hover {
+            background-color: #c62828;
+            color: white;
+        }
+
         .btn-outline-secondary {
             background-color: #757575;
             color: white;
@@ -41,13 +51,16 @@
         .btn-outline-secondary:hover {
             background-color: #616161;
         }
-        
+
+        .table th {
+            width: 200px;
+        }
     </style>
 
     {% if is_granted('ROLE_ADMIN') %}
-        <h1>Participante</h1>
+        <h1>Detalles del Participante</h1>
 
-        <table class="table">
+        <table class="table table-striped">
             <tbody>
                 <tr>
                     <th>Id</th>
@@ -72,17 +85,27 @@
             </tbody>
         </table>
 
-        <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
-            Volver al Listado
-        </a>
+        <div class="mt-3">
+            <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
+                Volver al Listado
+            </a>
 
-        <a href="{{ path('app_participante_edit', {'id': participante.id}) }}" class="btn btn-editar">Editar</a>
-        
+            <a href="{{ path('app_participante_edit', {'id': participante.id}) }}" class="btn btn-editar">
+                Editar
+            </a>
+
+            {# Botón de eliminar en POST con CSRF #}
+            <form method="post" action="{{ path('app_participante_delete', {'id': participante.id}) }}" style="display:inline-block;" onsubmit="return confirm('¿Seguro que deseas eliminar este participante?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participante.id) }}">
+                <button type="submit" class="btn btn-eliminar">Eliminar</button>
+            </form>
+        </div>
+
     {% else %}
-        <h1>Necesitas permisos de Administrador</h1>
+        <h1>Acceso restringido</h1>
+        <p>Necesitas permisos de <strong>Administrador</strong> para ver esta página.</p>
         <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
             Volver al Listado
         </a>
     {% endif %}
-
 {% endblock %}
