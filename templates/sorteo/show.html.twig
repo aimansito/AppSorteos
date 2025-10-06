@@ -109,9 +109,13 @@
             {% endif %}
 
             <div class="action-buttons">
-                <a href="{{ path('app_sorteo_sortear', {'id': sorteo.id}) }}" class="btn btn-lg btn-sortear text-white">
-                    Sortear
-                </a>
+                <form method="POST" action="{{ path('app_sorteo_sortear', {'id': sorteo.id}) }}" style="display: inline-block;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('sortear' ~ sorteo.id) }}">
+                    <button type="submit" class="btn btn-lg btn-sortear text-white">
+                        Sortear
+                    </button>
+                </form>
+
                 <a href="{{ path('app_main') }}" class="btn btn-secondary btn-lg">
                     Volver al Listado
                 </a>
