@@ -142,16 +142,19 @@ class SorteoController extends AbstractController
     #[Route('/{id}/sortear', name: 'app_sorteo_sortear', methods: ['POST'])]
     public function sortear(Request $request, Sorteo $sorteo, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
+        // Verificar CSRF
         if (!$this->isCsrfTokenValid('sortear'.$sorteo->getId(), $request->request->get('_token'))) {
             $this->addFlash('error', 'Token CSRF inválido.');
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
+        // Verificar si ya hay ganador
         if ($sorteo->getParticipantes()->exists(fn($i, $p) => $p->isEsGanador())) {
             $this->addFlash('warning', 'Ya hay un ganador en este sorteo.');
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
+        // Obtener participantes
         $participantes = $sorteo->getParticipantes()->toArray();
 
         if (empty($participantes)) {
@@ -159,9 +162,11 @@ class SorteoController extends AbstractController
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
+        // Seleccionar ganador aleatorio
         $ganador = $participantes[array_rand($participantes)];
         $ganador->setEsGanador(true);
 
+        // Crear histórico
         $historico = new Historico();
         $historico->setSorteo($sorteo);
         $historico->setFecha(new DateTimeImmutable("now", new DateTimeZone("Europe/Madrid")));
@@ -171,98 +176,59 @@ class SorteoController extends AbstractController
         $em->persist($historico);
         $em->flush();
 
-        // Remitente debe coincidir con MAILER_DSN
-        $from = 'ahardao1001@g.educaand.es';
-
+        // ENVIAR EMAIL AL GANADOR con plantilla HTML
         try {
             $emailGanador = (new Email())
-                ->from($from)
+                ->from('ahardao1001@g.educaand.es')
                 ->to($ganador->getEmail())
-                ->subject('¡Felicidades, has ganado el sorteo!')
-                ->text("Hola {$ganador->getNombre()},\n\nHas ganado el sorteo \"{$sorteo->getNombreActividad()}\".\n¡Enhorabuena!");
+                ->subject('¡Felicidades! Has ganado: ' . $sorteo->getNombreActividad())
+                ->html($this->renderView('emails/ganador.html.twig', [
+                    'ganador' => $ganador,
+                    'sorteo' => $sorteo
+                ]));
 
             $mailer->send($emailGanador);
+            
         } catch (TransportExceptionInterface $e) {
-            $this->addFlash('error', 'Error al enviar correo al ganador: ' . $e->getMessage());
+            $this->addFlash('warning', 'El sorteo se realizó pero hubo un problema al enviar el email al ganador: ' . $e->getMessage());
         }
 
+        // ENVIAR EMAILS A LOS QUE NO GANARON con plantilla HTML
+        $emailsEnviados = 0;
+        $emailsFallidos = 0;
+        
         foreach ($participantes as $p) {
             if ($p !== $ganador) {
                 try {
                     $emailPerdedor = (new Email())
-                        ->from($from)
+                        ->from('ahardao1001@g.educaand.es')
                         ->to($p->getEmail())
-                        ->subject('Resultado del sorteo')
-                        ->text("Hola {$p->getNombre()},\n\nEl sorteo \"{$sorteo->getNombreActividad()}\" ya tiene ganador. ¡Gracias por participar!");
+                        ->subject('Resultado del sorteo: ' . $sorteo->getNombreActividad())
+                        ->html($this->renderView('emails/no_ganador.html.twig', [
+                            'participante' => $p,
+                            'sorteo' => $sorteo
+                        ]));
+                        
                     $mailer->send($emailPerdedor);
+                    $emailsEnviados++;
+                    
                 } catch (TransportExceptionInterface $e) {
-                    $this->addFlash('error', 'Error al enviar correo a '.$p->getEmail().': '.$e->getMessage());
-                               }
+                    $emailsFallidos++;
+                }
             }
         }
 
-        $this->addFlash('success', '¡El sorteo se ha realizado y los participantes han sido notificados!');
+        // Mensaje de éxito
+        $mensaje = '🎉 ¡El sorteo se ha realizado correctamente!';
+        if ($emailsEnviados > 0) {
+            $mensaje .= " Se han enviado {$emailsEnviados} notificaciones.";
+        }
+        if ($emailsFallidos > 0) {
+            $mensaje .= " (Hubo {$emailsFallidos} emails que no se pudieron enviar)";
+        }
+        
+        $this->addFlash('success', $mensaje);
 
         return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
-    }
-
-    #[Route('/{id}/test-email', name: 'app_sorteo_test_email_id', methods: ['GET'])]
-    public function testEmailConId(int $id, SorteoRepository $repo, MailerInterface $mailer): Response
-    {
-        $sorteo = $repo->find($id);
-
-        if (!$sorteo) {
-            return new Response('❌ Sorteo no encontrado.', 404);
-        }
-
-        $email = (new Email())
-            ->from('ahardao1001@g.educaand.es')
-            ->to('aimaninstituto2020@gmail.com')
-            ->subject('Prueba con sorteo: ' . $sorteo->getNombreActividad())
-            ->text('Este es un correo de prueba relacionado con el sorteo "' . $sorteo->getNombreActividad() . '".')
-            ->html('<p><strong>TEST DE CORREO</strong></p><p>Sorteo: ' . $sorteo->getNombreActividad() . '</p>');
-
-        try {
-            $mailer->send($email);
-            
-            $debug = "Correo enviado correctamente.<br><br>";
-            $debug .= "De: ahardao1001@g.educaand.es<br>";
-            $debug .= "Para: aimaninstituto2020@gmail.com<br>";
-            $debug .= "Asunto: Prueba con sorteo: " . $sorteo->getNombreActividad() . "<br>";
-            $debug .= "MAILER_DSN: " . $_ENV['MAILER_DSN'] ?? 'NO DEFINIDO';
-            
-            return new Response($debug);
-            
-        } catch (\Exception $e) {
-            return new Response('Error: ' . $e->getMessage() . '<br><br>Trace:<br>' . nl2br($e->getTraceAsString()), 500);
-        }
-    }
-
-    #[Route('/{id}/notificar-ganador', name: 'app_sorteo_notificar_ganador', methods: ['POST'])]
-    public function notificarGanador(int $id, SorteoRepository $repo, MailerInterface $mailer): Response
-    {
-        $sorteo = $repo->find($id);
-        
-        if (!$sorteo || !$sorteo->getGanador()) {
-            return $this->json(['error' => 'No hay ganador definido'], 400);
-        }
-        
-        $ganador = $sorteo->getGanador();
-        
-        $email = (new Email())
-            ->from('ahardao1001@g.educaand.es')
-            ->to($ganador->getEmail())
-            ->subject('¡Felicidades! Has ganado: ' . $sorteo->getNombreActividad())
-            ->html($this->renderView('emails/ganador.html.twig', [
-                'ganador' => $ganador,
-                'sorteo' => $sorteo
-            ]));
-        
-        try {
-            $mailer->send($email);
-            return $this->json(['success' => true, 'message' => 'Email enviado al ganador']);
-        } catch (\Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 500);
-        }
     }
 }

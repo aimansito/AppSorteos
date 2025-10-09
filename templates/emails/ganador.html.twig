@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+        .emoji {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .content h2 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .info-box p {
+            margin: 5px 0;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="emoji">🎉</div>
+            <h1>¡Felicidades {{ ganador.nombre }}!</h1>
+        </div>
+        
+        <div class="content">
+            <p>Nos complace enormemente informarte que <strong>¡HAS GANADO!</strong></p>
+            
+            <h2>{{ sorteo.nombreActividad }}</h2>
+            
+            <div class="info-box">
+                <p><strong>📅 Fecha:</strong> {{ sorteo.fecha|date('d/m/Y H:i') }}</p>
+                <p><strong>📍 Lugar:</strong> {{ sorteo.lugar }}</p>
+                <p><strong>✉️ Tu email:</strong> {{ ganador.email }}</p>
+            </div>
+            
+            <p>Has sido seleccionado entre todos los participantes del sorteo. ¡Enhorabuena!</p>
+            
+            <p>Por favor, conserva este correo como comprobante y ponte en contacto con nosotros para más detalles sobre cómo reclamar tu premio.</p>
+            
+            <p><strong>¡Te esperamos!</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p>Este es un correo automático, por favor no respondas a este mensaje.</p>
+            <p>Si tienes alguna duda, contacta con nosotros.</p>
+        </div>
+    </div>
+</body>
+</html>
