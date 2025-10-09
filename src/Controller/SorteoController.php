@@ -219,7 +219,7 @@ class SorteoController extends AbstractController
         }
 
         // Mensaje de éxito
-        $mensaje = '🎉 ¡El sorteo se ha realizado correctamente!';
+        $mensaje = '¡El sorteo se ha realizado correctamente!';
         if ($emailsEnviados > 0) {
             $mensaje .= " Se han enviado {$emailsEnviados} notificaciones.";
         }
