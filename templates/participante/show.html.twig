@@ -55,7 +55,16 @@
         .table th {
             width: 200px;
         }
+
+        img {
+            width: 200px;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
+    <img src="{{asset('images/logo.png')}}"     alt="Logo">
 
     {% if is_granted('ROLE_ADMIN') %}
         <h1>Detalles del Participante</h1>

@@ -21,11 +21,21 @@
             padding-top: 2px;
             font-size: 1.1rem;
         }
+
+        img {
+            width: 200px;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 {% endblock %}
 
 {% block body %}
 <div class="full-width-form-container">
+        <img src="{{asset('images/logo.png')}}" alt="Logo">
+
 <form method="post">
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>

@@ -11,7 +11,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/historico')]
 #[IsGranted('ROLE_ADMIN')]
 class HistoricoController extends AbstractController {
-    #[Route('/historico', 'app_historico', methods:["get"])]
+    #[Route('/', 'app_historico', methods:["get"])]
     public function index(HistoricoRepository $historicoRepository): Response {
         $historicos = $historicoRepository->findAll();
 
