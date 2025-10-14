@@ -28,11 +28,17 @@ class Sorteo
     #[ORM\Column(length: 255)]
     private ?string $lugar = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?int $maxParticipantes = null;
+    
+    #[ORM\Column]
+    private bool $participantesIlimitados = false;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imagen = null;
+
+    #[ORM\Column]
+    private bool $activo = true;
 
     #[ORM\OneToMany(mappedBy: 'sorteo', targetEntity: Participante::class, cascade: ['persist', 'remove'])]
     private Collection $participantes;
@@ -85,7 +91,7 @@ class Sorteo
         return $this->maxParticipantes;
     }
 
-    public function setMaxParticipantes(int $maxParticipantes): static
+    public function setMaxParticipantes(?int $maxParticipantes): static
     {
         $this->maxParticipantes = $maxParticipantes;
         return $this;
@@ -99,6 +105,28 @@ class Sorteo
     public function setImagen(?string $imagen): static
     {
         $this->imagen = $imagen;
+        return $this;
+    }
+    
+    public function isParticipantesIlimitados(): bool
+    {
+        return $this->participantesIlimitados;
+    }
+    
+    public function setParticipantesIlimitados(bool $participantesIlimitados): static
+    {
+        $this->participantesIlimitados = $participantesIlimitados;
+        return $this;
+    }
+
+    public function isActivo(): bool
+    {
+        return $this->activo;
+    }
+
+    public function setActivo(bool $activo): static
+    {
+        $this->activo = $activo;
         return $this;
     }
 
@@ -132,10 +160,16 @@ class Sorteo
     }
 
     public function getPlazasRestantes(): int {
+        if ($this->participantesIlimitados) {
+            return PHP_INT_MAX; // Valor máximo para representar "ilimitado"
+        }
         return $this->maxParticipantes - count($this->participantes);
     }
 
     public function tienePlazasDisponibles(): bool {
-        return $this->getPlazasRestantes() > 0 ; 
+        if ($this->participantesIlimitados) {
+            return true; // Siempre hay plazas disponibles si es ilimitado
+        }
+        return $this->getPlazasRestantes() > 0; 
     }
 }

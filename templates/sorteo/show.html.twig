@@ -71,7 +71,11 @@
                 <h2 class="raffle-subtitle">Sorteo: {{ sorteo.nombreActividad }}</h2>
                 <p><strong>Fecha:</strong> {{ sorteo.fecha|date('d/m/Y H:i') }}</p>
                 <p><strong>Lugar:</strong> {{ sorteo.lugar }}</p>
-                <p><strong>Máx participantes:</strong> {{ sorteo.maxParticipantes }}</p>
+                {% if sorteo.participantesIlimitados %}
+                    <p><strong>Participantes:</strong> Ilimitados</p>
+                {% else %}
+                    <p><strong>Máx participantes:</strong> {{ sorteo.maxParticipantes }}</p>
+                {% endif %}
             </div>
 
             <h3 class="raffle-subtitle">Participantes ({{ participantes|length }})</h3>

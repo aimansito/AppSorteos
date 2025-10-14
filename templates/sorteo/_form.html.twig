@@ -1,43 +1,77 @@
 {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
 
-    <div class="mb-3">
-        {# nombreActividad #}
-        {{ form_row(form.nombreActividad, {
-            'attr': {'class': 'form-control form-control-lg form-control-yellow'}
-        }) }}
-    </div>
+<div class="mb-3">
+    {# nombreActividad #}
+    {{ form_row(form.nombreActividad, {
+        'attr': {'class': 'form-control form-control-lg form-control-yellow'}
+    }) }}
+</div>
 
-    <div class="mb-3">
-        {# fecha #}
-        {{ form_row(form.fecha, {
-            'attr': {'class': 'form-control form-control-lg form-control-yellow'}
-        }) }}
-    </div>
+<div class="mb-3">
+    {# fecha #}
+    {{ form_row(form.fecha, {
+        'attr': {'class': 'form-control form-control-lg form-control-yellow'}
+    }) }}
+</div>
 
-    <div class="mb-3">
-        {# lugar #}
-        {{ form_row(form.lugar, {
-            'attr': {'class': 'form-control form-control-lg form-control-yellow'}
-        }) }}
-    </div>
+<div class="mb-3">
+    {# lugar #}
+    {{ form_row(form.lugar, {
+        'attr': {'class': 'form-control form-control-lg form-control-yellow'}
+    }) }}
+</div>
 
-    <div class="mb-3">
-        {# maxParticipantes #}
-        {{ form_row(form.maxParticipantes, {
-            'attr': {'class': 'form-control form-control-lg form-control-yellow'}
-        }) }}
-    </div>
+<div class="mb-3">
+    {# participantesIlimitados #}
+    {{ form_row(form.participantesIlimitados, {
+        'attr': {
+            'class': 'form-check-input',
+            'data-toggle': 'participantes-ilimitados'
+        }
+    }) }}
+</div>
 
-    <div class="d-flex justify-content-center gap-3 mt-4"> 
-        
-        <button type="submit" class="btn btn-guardar">
-            {{ button_label|default('Guardar Sorteo') }}
-        </button>
+<div class="mb-3" data-toggle="max-participantes-container">
+    {# maxParticipantes #}
+    {{ form_row(form.maxParticipantes, {
+        'attr': {
+            'class': 'form-control form-control-lg form-control-yellow',
+            'data-toggle': 'max-participantes'
+        }
+    }) }}
+</div>
 
-        <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
-            Volver al Listado
-        </a>
-        
-    </div>
-    
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ilimitadosCheckbox = document.querySelector('[data-toggle="participantes-ilimitados"]');
+    const maxParticipantesContainer = document.querySelector('[data-toggle="max-participantes-container"]');
+    const maxParticipantesInput = document.querySelector('[data-toggle="max-participantes"]');
+
+    if (!ilimitadosCheckbox || !maxParticipantesInput || !maxParticipantesContainer) return;
+
+    function toggleMaxParticipantes() {
+        const checked = ilimitadosCheckbox.checked;
+        maxParticipantesContainer.style.display = checked ? 'none' : 'block';
+        maxParticipantesInput.disabled = checked;
+        if (checked) maxParticipantesInput.value = '';
+    }
+
+    // Ejecutar al cargar la página
+    toggleMaxParticipantes();
+
+    // Ejecutar cuando cambie el checkbox
+    ilimitadosCheckbox.addEventListener('change', toggleMaxParticipantes);
+});
+</script>
+
+<div class="d-flex justify-content-center gap-3 mt-4"> 
+    <button type="submit" class="btn btn-guardar">
+        {{ button_label|default('Guardar Sorteo') }}
+    </button>
+
+    <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
+        Volver al Listado
+    </a>
+</div>
+
 {{ form_end(form) }}

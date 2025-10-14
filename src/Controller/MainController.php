@@ -12,11 +12,17 @@ class MainController extends AbstractController
     #[Route('/', name: 'app_main')]
     public function index(SorteoRepository $sorteoRepository): Response
     {
-        
         $sorteos = $sorteoRepository->findActivos();
+        $sorteosInactivos = [];
+
+        // Solo cargar sorteos inactivos para administradores
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $sorteosInactivos = $sorteoRepository->findInactivos();
+        }
 
         return $this->render('main/index.html.twig', [
             'sorteos' => $sorteos,
+            'sorteosInactivos' => $sorteosInactivos,
         ]);
     }
 }

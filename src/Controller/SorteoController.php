@@ -38,6 +38,11 @@ class SorteoController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Si participantes ilimitados está activado, establecer maxParticipantes a null
+            if ($sorteo->isParticipantesIlimitados()) {
+                $sorteo->setMaxParticipantes(null);
+            }
+            
             $em->persist($sorteo);
             $em->flush();
             $this->addFlash('success', 'Sorteo creado correctamente.');
@@ -78,6 +83,11 @@ class SorteoController extends AbstractController
                     "form" => $form->createView()
                 ]);
             }
+            
+            // Si participantes ilimitados está activado, establecer maxParticipantes a null
+            if ($sorteo->isParticipantesIlimitados()) {
+                $sorteo->setMaxParticipantes(null);
+            }
 
             $em->flush();
             $this->addFlash('success', 'Sorteo actualizado correctamente.');
@@ -94,9 +104,10 @@ class SorteoController extends AbstractController
     public function delete(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
     {
         if ($this->isCsrfTokenValid('delete' . $sorteo->getId(), $request->request->get('_token'))) {
-            $em->remove($sorteo);
+            // Cambiar el estado a false en lugar de eliminar
+            $sorteo->setActivo(false);
             $em->flush();
-            $this->addFlash('success', 'Sorteo eliminado correctamente.');
+            $this->addFlash('success', 'Sorteo ocultado correctamente.');
         }
 
         return $this->redirectToRoute('app_main');
@@ -230,5 +241,18 @@ class SorteoController extends AbstractController
         $this->addFlash('success', $mensaje);
 
         return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+    }
+
+    #[Route('/{id}/restaurar', name: 'app_sorteo_restaurar', methods: ['POST'])]
+    public function restaurar(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('restaurar' . $sorteo->getId(), $request->request->get('_token'))) {
+            // Restaurar el sorteo cambiando el estado a true
+            $sorteo->setActivo(true);
+            $em->flush();
+            $this->addFlash('success', 'Sorteo restaurado correctamente.');
+        }
+
+        return $this->redirectToRoute('app_main');
     }
 }

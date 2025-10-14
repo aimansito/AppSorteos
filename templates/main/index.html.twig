@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Sorteos Disponibles{% endblock %}
+{% block title %}Sorteos CrossOver{% endblock %}
 
 {% block body %}
 <style>
@@ -18,7 +18,7 @@
 
     h1 {
         color: #3f51b5;
-        border-bottom: 3px solid #ff9800);
+        border-bottom: 3px solid #ff9800;
         padding-bottom: 10px;
         margin-bottom: 25px;
         font-size: 2.2em;
@@ -61,23 +61,6 @@
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
-    .btn-primary, .login-button {
-        background-color: #3f51b5;
-        color: white;
-    }
-
-    .btn-primary:hover, .login-button:hover {
-        background-color: #303f9f;
-    }
-
-    .logout-button {
-        background-color: #757575;
-        color: white;
-    }
-
-    .logout-button:hover {
-        background-color: #616161;
-    }
 
     .btn-success {
         background-color: #4CAF50;
@@ -89,12 +72,12 @@
     }
 
     .btn-danger {
-        background-color: #F44336;
+        background-color: #4a4a4a;
         color: white;
     }
 
     .btn-danger:hover {
-        background-color: #E53935;
+        background-color: #1e1e1e;
     }
 
     .btn-info {
@@ -110,7 +93,14 @@
         list-style: none;
         padding: 0;
         display: grid;
+        grid-template-columns: repeat(2, 1fr);
         gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .sorteo-list {
+            grid-template-columns: 1fr;
+        }
     }
 
     .sorteo-list li {
@@ -128,13 +118,14 @@
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
     }
 
-    .sorteo-list strong {
-        font-size: 1.3em;
-        display: block;
-        margin-bottom: 8px;
-        color: #3f51b5;
-        font-weight: 500;
+   .sorteo-list strong {
+    font-size: 1.1em;
+    display: inline-block;
+    margin-right: 5px;
+    color: #3f51b5;
+    font-weight: 500;
     }
+
     
     .plazas-restantes {
         font-weight: 600;
@@ -172,6 +163,24 @@
         font-weight: 500;
         text-align: center;
     }
+
+    .herramientas{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-left: 15%;
+    }
+    .sorteo-actions { 
+    margin-top: 15px; 
+    text-align: center; /* centra Unirse o Completo */
+}
+
+.admin-buttons {
+    margin-top: 10px; /* un pequeño espacio debajo del botón central */
+    text-align: center;  /* mantiene Ver Participantes y Borrar a la izquierda */
+}
+
+
 </style>
 
 <div class="example-wrapper">
@@ -179,11 +188,8 @@
 
     {% if app.user %}
         <div class="user-controls">
-            <h3>Hola {{ app.user.username }}!</h3>
-            <div>
-                <a href="{{ path('app_logout') }}" class="logout-button">Cerrar Sesión</a>
-            
-            
+            <h2>Hola {{ app.user.username }}!</h2>
+            <div class="herramientas">
                 <a href="{{ path('app_sorteo_new') }}" class="btn btn-primary">Nuevo Sorteo</a>
                 
                 <a href="{{ path('app_register') }}" class="btn btn-primary">Añadir nuevo Admin</a>
@@ -194,10 +200,6 @@
             </div>
             
         </div>
-    {% else %}
-        <div class="user-controls" style="justify-content: center; background-color: #e3f2fd;">
-            <a href="{{ path('app_login') }}" class="login-button">Iniciar sesión</a>
-        </div>
     {% endif %}
 
     {% set ahora = "now"|date("Y-m-d H:i:s") %}
@@ -207,36 +209,77 @@
         <p>No hay sorteos disponibles por ahora.</p>
     {% else %}
        <ul class="sorteo-list">
-    {% for sorteo in sorteosActivos %}
-        <li>
-            <strong>{{ sorteo.nombreActividad }}</strong><br>
-            Fecha: {{ sorteo.fecha|date('d/m/Y H:i') }}<br>
-            Lugar: {{ sorteo.lugar }}<br>
-            Máx participantes: {{ sorteo.maxParticipantes }}<br>
-            Plazas restantes: {{ sorteo.getPlazasRestantes() }}<br>
+{% for sorteo in sorteosActivos %}
+    <li>
+    <h4>{{ sorteo.nombreActividad }}</h4><br>
+    <strong>Fecha: </strong>{{ sorteo.fecha|date('d/m/Y H:i') }}<br>
+    <strong>Lugar: </strong>{{ sorteo.lugar }}<br>
+    {% if sorteo.participantesIlimitados %}
+        <strong>Participantes: </strong>Ilimitados<br>
+    {% else %}
+        <strong>Máx participantes: </strong>{{ sorteo.maxParticipantes }}<br>
+        <strong>Plazas restantes: </strong>{{ sorteo.getPlazasRestantes() }}<br>
+    {% endif %}
 
-            {% if is_granted('ROLE_ADMIN') %}
+    {# --- Botón central Unirse / Completo --- #}
+    <div class="sorteo-actions">
+        {% if sorteo.tienePlazasDisponibles() %}
+            <a href="{{ path('app_sorteo_apuntarse', {'id': sorteo.id}) }}" class="btn btn-success">Unirse</a>
+        {% else %}
+            <h3 style="color: red;">Completo</h3>
+        {% endif %}
+    </div>
 
-                {# --- OPCIONAL: DEPENDE DE SI EL ADMIN SE PUEDE UNIR A UN SORTEO O NO --- #}
-                <a href="{{ path('app_sorteo_apuntarse', {'id': sorteo.id}) }}" class="btn btn-success">Unirse</a>
+    {# --- Botones adicionales alineados a la izquierda (solo para sesión con admin) --- #}
+    {% if is_granted('ROLE_ADMIN') %}
+        <div class="admin-buttons">
+            <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
+            <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres ocultar este sorteo?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sorteo.id) }}">
+                <button class="btn btn-danger">Ocultar</button>
+            </form>
+        </div>
+    {% endif %}
+</li>
 
-                <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
-
-                <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres borrar este sorteo?');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sorteo.id) }}">
-                    <button class="btn btn-danger">Borrar</button>
-                </form>
-            {% else %}
-                {% if sorteo.tienePlazasDisponibles() %}
-                    <a href="{{ path('app_sorteo_apuntarse', {'id': sorteo.id}) }}" class="btn btn-success">Unirse</a>
-                {% else %}
-                   <h3 style="color: red;">Completo</h3>
-                {% endif %}
-            {% endif %}
-        </li>
-    {% endfor %}
+{% endfor %}
 </ul>
 
+
+    {% endif %}
+
+    {# --- Sección de sorteos ocultos para administradores --- #}
+    {% if is_granted('ROLE_ADMIN') and sorteosInactivos is not empty %}
+        <div style="margin-top: 40px;">
+            <details>
+                <summary style="cursor: pointer; background-color: #f8f9fa; padding: 10px 15px; border: 1px solid #dee2e6; border-radius: 5px; font-weight: bold; color: #6c757d;">
+                    📁 Sorteos Ocultos ({{ sorteosInactivos|length }})
+                </summary>
+                
+                <ul class="sorteo-list" style="margin-top: 15px;">
+                {% for sorteo in sorteosInactivos %}
+                    <li style="border-left-color: #6c757d; background-color: #f8f9fa;">
+                        <h4>{{ sorteo.nombreActividad }}</h4><br>
+                        <strong>Fecha: </strong>{{ sorteo.fecha|date('d/m/Y H:i') }}<br>
+                        <strong>Lugar: </strong>{{ sorteo.lugar }}<br>
+                        {% if sorteo.participantesIlimitados %}
+                            <strong>Participantes: </strong>Ilimitados<br>
+                        {% else %}
+                            <strong>Máx participantes: </strong>{{ sorteo.maxParticipantes }}<br>
+                        {% endif %}
+                        
+                        <div class="admin-buttons">
+                            <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
+                            <form method="post" action="{{ path('app_sorteo_restaurar', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres restaurar este sorteo?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('restaurar' ~ sorteo.id) }}">
+                                <button class="btn btn-success">Restaurar</button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            </details>
+        </div>
     {% endif %}
 </div>
 {% endblock %}

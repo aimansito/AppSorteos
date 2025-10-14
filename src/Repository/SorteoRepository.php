@@ -21,8 +21,20 @@ class SorteoRepository extends ServiceEntityRepository
         $ahora = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Madrid')); 
         return $this->createQueryBuilder('s')
             ->where('s.fecha > :ahora')
+            ->andWhere('s.activo = :activo')
             ->setParameter('ahora', $ahora)
+            ->setParameter('activo', true)
             ->orderBy('s.fecha', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findInactivos(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.activo = :activo')
+            ->setParameter('activo', false)
+            ->orderBy('s.fecha', 'DESC')
             ->getQuery()
             ->getResult();
     }
