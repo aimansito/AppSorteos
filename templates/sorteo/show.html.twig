@@ -55,8 +55,7 @@
             margin-top: 40px;
             border-top: 1px solid #ddd;
             padding-top: 20px;
-        }
-
+        }        
     </style>
 {% endblock %}
 
@@ -64,6 +63,9 @@
     <div class="raffle-detail-container">
 
         {% if is_granted('ROLE_ADMIN') %}
+            {% if sorteo.imagen is not empty %}
+                <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="sorteo-imagen">
+            {% endif %}
             <h1>Detalles del Sorteo</h1>
             <hr>
 

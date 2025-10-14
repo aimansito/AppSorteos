@@ -97,7 +97,7 @@ class Sorteo
         return $this;
     }
 
-    public function getImagen(): ?int
+    public function getImagen(): ?string
     {
         return $this->imagen;
     }

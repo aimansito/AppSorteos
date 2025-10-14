@@ -10,7 +10,9 @@ use App\Repository\SorteoRepository;
 use DateTimeImmutable;
 use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,10 +20,15 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/sorteo')]
 class SorteoController extends AbstractController
 {
+    private const UPLOAD_DIR_PARAMETER = 'sorteo_images_directory';
+
+    public function __construct(private SluggerInterface $slugger) {}
+
     #[Route(name: 'app_sorteo_index', methods: ['GET'])]
     public function index(SorteoRepository $sorteoRepository): Response
     {
@@ -41,6 +48,32 @@ class SorteoController extends AbstractController
             // Si participantes ilimitados está activado, establecer maxParticipantes a null
             if ($sorteo->isParticipantesIlimitados()) {
                 $sorteo->setMaxParticipantes(null);
+            }
+
+            $imagenFile = $form->get('imagenFile')->getData();
+            $uploadDirectory = $this->getParameter(self::UPLOAD_DIR_PARAMETER);
+
+            if($imagenFile) {
+                if(!is_dir($uploadDirectory)) {
+                    if(!mkdir($uploadDirectory, 0777, true)) {
+                        $this->addFlash('error', sprintf('No se pudo crear el directorio de subida: "%s"', $uploadDirectory));
+                        return $this->redirectToRoute('app_sorteo_new');
+                    }
+                }
+
+                $fecha = $sorteo->getFecha()->format('Ymd');
+                $nombreActividad = $sorteo->getNombreActividad();
+                $archivoSlug = $this->slugger->slug($nombreActividad);
+                $archivoNuevo = sprintf('%s-%s-%s', $archivoSlug, $fecha, $imagenFile->guessExtension());
+
+                try {
+                    $imagenFile->move($uploadDirectory, $archivoNuevo);
+                } catch(FileException $e) {
+                    $this->addFlash('error', 'Error al subir la imagen: '. $e->getCode());
+                    return $this->redirectToRoute('app_sorteo_nuevo');
+                }
+
+                $sorteo->setImagen($archivoNuevo);
             }
             
             $em->persist($sorteo);

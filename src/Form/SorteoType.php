@@ -5,11 +5,13 @@ namespace App\Form;
 use App\Entity\Sorteo;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class SorteoType extends AbstractType
 {
@@ -33,7 +35,21 @@ class SorteoType extends AbstractType
                     'data-depends-on' => 'sorteo_participantesIlimitados',
                 ]
             ])
-        ;
+            ->add('imagenFile', FileType::class, [
+                'label' => 'Logo de la actividad (JPG o PNG)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '5M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png'
+                        ],
+                        'mimeTypesMessage' => 'Por favor, sube un archivo de imagen válido (JPG o PNG)'
+                    ])
+                ]
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
