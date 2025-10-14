@@ -31,7 +31,9 @@ class Sorteo
     #[ORM\Column]
     private ?int $maxParticipantes = null;
 
-  
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imagen = null;
+
     #[ORM\OneToMany(mappedBy: 'sorteo', targetEntity: Participante::class, cascade: ['persist', 'remove'])]
     private Collection $participantes;
 
@@ -40,7 +42,6 @@ class Sorteo
         $this->participantes = new ArrayCollection();
     }
 
-   
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +91,16 @@ class Sorteo
         return $this;
     }
 
+    public function getImagen(): ?int
+    {
+        return $this->imagen;
+    }
+
+    public function setImagen(?string $imagen): static
+    {
+        $this->imagen = $imagen;
+        return $this;
+    }
 
     /**
      * @return Collection<int, Participante>
