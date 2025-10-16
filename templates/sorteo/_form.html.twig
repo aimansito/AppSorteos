@@ -41,27 +41,43 @@
     }) }}
 </div>
 
+<div class="mb-3">
+    {# numeroGanadores #}
+    {{ form_row(form.numeroGanadores, {
+        'attr': {'class': 'form-control form-control-lg form-control-yellow'}
+    }) }}
+</div>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ilimitadosCheckbox = document.querySelector('[data-toggle="participantes-ilimitados"]');
-    const maxParticipantesContainer = document.querySelector('[data-toggle="max-participantes-container"]');
-    const maxParticipantesInput = document.querySelector('[data-toggle="max-participantes"]');
+(function() {
+    function initToggle() {
+        const ilimitadosCheckbox = document.querySelector('[data-toggle="participantes-ilimitados"]');
+        const maxParticipantesContainer = document.querySelector('[data-toggle="max-participantes-container"]');
+        const maxParticipantesInput = document.querySelector('[data-toggle="max-participantes"]');
 
-    if (!ilimitadosCheckbox || !maxParticipantesInput || !maxParticipantesContainer) return;
+        if (!ilimitadosCheckbox || !maxParticipantesInput || !maxParticipantesContainer) return;
 
-    function toggleMaxParticipantes() {
-        const checked = ilimitadosCheckbox.checked;
-        maxParticipantesContainer.style.display = checked ? 'none' : 'block';
-        maxParticipantesInput.disabled = checked;
-        if (checked) maxParticipantesInput.value = '';
+        function toggleMaxParticipantes() {
+            const checked = ilimitadosCheckbox.checked;
+            maxParticipantesContainer.style.display = checked ? 'none' : 'block';
+            maxParticipantesInput.disabled = checked;
+            if (checked) maxParticipantesInput.value = '';
+        }
+
+        // Evitar agregar múltiples listeners si Turbo recarga el contenido
+        if (ilimitadosCheckbox.dataset.toggleInitialized !== 'true') {
+            ilimitadosCheckbox.addEventListener('change', toggleMaxParticipantes);
+            ilimitadosCheckbox.dataset.toggleInitialized = 'true';
+        }
+
+        // Ejecutar al cargar la página/navegación
+        toggleMaxParticipantes();
     }
 
-    // Ejecutar al cargar la página
-    toggleMaxParticipantes();
-
-    // Ejecutar cuando cambie el checkbox
-    ilimitadosCheckbox.addEventListener('change', toggleMaxParticipantes);
-});
+    // Compatibilidad con navegación Turbo y carga inicial del DOM
+    document.addEventListener('turbo:load', initToggle);
+    document.addEventListener('DOMContentLoaded', initToggle);
+})();
 </script>
 
 <div class="mb-3">

@@ -34,6 +34,9 @@ class Participante
     #[ORM\Column]
     private ?bool $esGanador = false;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $puesto = null;
+
     #[ORM\ManyToOne(targetEntity: Sorteo::class, inversedBy: 'participantes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Sorteo $sorteo = null;
@@ -84,6 +87,17 @@ class Participante
     public function setEsGanador(bool $esGanador): static
     {
         $this->esGanador = $esGanador;
+        return $this;
+    }
+
+    public function getPuesto(): ?int
+    {
+        return $this->puesto;
+    }
+
+    public function setPuesto(?int $puesto): static
+    {
+        $this->puesto = $puesto;
         return $this;
     }
 

@@ -204,9 +204,9 @@ class SorteoController extends AbstractController
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
-        // Verificar si ya hay ganador
+        // Verificar si ya hay ganadores previamente
         if ($sorteo->getParticipantes()->exists(fn($i, $p) => $p->isEsGanador())) {
-            $this->addFlash('warning', 'Ya hay un ganador en este sorteo.');
+            $this->addFlash('warning', 'Ya se han seleccionado ganadores en este sorteo.');
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
@@ -218,43 +218,60 @@ class SorteoController extends AbstractController
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
-        // Seleccionar ganador aleatorio
-        $ganador = $participantes[array_rand($participantes)];
-        $ganador->setEsGanador(true);
+        // Seleccionar múltiples ganadores en una sola acción
+        $numeroGanadores = max(1, $sorteo->getNumeroGanadores());
+        $totalParticipantes = count($participantes);
+        $numeroGanadores = min($numeroGanadores, $totalParticipantes);
 
-        // Crear histórico
-        $historico = new Historico();
-        $historico->setSorteo($sorteo);
-        $historico->setFecha(new DateTimeImmutable("now", new DateTimeZone("Europe/Madrid")));
-        $historico->setGanador($ganador);
-        $historico->setNombreActividad($sorteo->getNombreActividad());
+        // Mezclar participantes y tomar los primeros N
+        shuffle($participantes);
+        $ganadores = array_slice($participantes, 0, $numeroGanadores);
 
-        $em->persist($historico);
-        $em->flush();
-
-        // ENVIAR EMAIL AL GANADOR con plantilla HTML
-        try {
-            $emailGanador = (new Email())
-                ->from('ahardao1001@g.educaand.es')
-                ->to($ganador->getEmail())
-                ->subject('¡Felicidades! Has ganado: ' . $sorteo->getNombreActividad())
-                ->html($this->renderView('emails/ganador.html.twig', [
-                    'ganador' => $ganador,
-                    'sorteo' => $sorteo
-                ]));
-
-            $mailer->send($emailGanador);
-            
-        } catch (TransportExceptionInterface $e) {
-            $this->addFlash('warning', 'El sorteo se realizó pero hubo un problema al enviar el email al ganador: ' . $e->getMessage());
-        }
-
-        // ENVIAR EMAILS A LOS QUE NO GANARON con plantilla HTML
         $emailsEnviados = 0;
         $emailsFallidos = 0;
-        
+
+        // Marcar ganadores, asignar puesto y crear historial para cada uno
+        foreach ($ganadores as $idx => $ganador) {
+            $ganador->setEsGanador(true);
+            $ganador->setPuesto($idx + 1);
+
+            $historico = new Historico();
+            $historico->setSorteo($sorteo);
+            $historico->setFecha(new DateTimeImmutable("now", new DateTimeZone("Europe/Madrid")));
+            $historico->setGanador($ganador);
+            $historico->setNombreActividad($sorteo->getNombreActividad());
+            $historico->setPuesto($idx + 1);
+
+            $em->persist($historico);
+        }
+
+        $em->flush();
+
+        // Enviar emails a ganadores
+        foreach ($ganadores as $ganador) {
+            try {
+                $emailGanador = (new Email())
+                    ->from('ahardao1001@g.educaand.es')
+                    ->to($ganador->getEmail())
+                    ->subject('¡Felicidades! Has ganado: ' . $sorteo->getNombreActividad())
+                    ->html($this->renderView('emails/ganador.html.twig', [
+                        'ganador' => $ganador,
+                        'sorteo' => $sorteo
+                    ]));
+
+                $mailer->send($emailGanador);
+                $emailsEnviados++;
+            } catch (TransportExceptionInterface $e) {
+                $emailsFallidos++;
+            }
+        }
+
+        // Enviar emails a los no ganadores
+        $ganadoresSet = new \SplObjectStorage();
+        foreach ($ganadores as $g) { $ganadoresSet->attach($g); }
+
         foreach ($participantes as $p) {
-            if ($p !== $ganador) {
+            if (!$ganadoresSet->contains($p)) {
                 try {
                     $emailPerdedor = (new Email())
                         ->from('ahardao1001@g.educaand.es')
@@ -264,10 +281,9 @@ class SorteoController extends AbstractController
                             'participante' => $p,
                             'sorteo' => $sorteo
                         ]));
-                        
+
                     $mailer->send($emailPerdedor);
                     $emailsEnviados++;
-                    
                 } catch (TransportExceptionInterface $e) {
                     $emailsFallidos++;
                 }
@@ -275,14 +291,14 @@ class SorteoController extends AbstractController
         }
 
         // Mensaje de éxito
-        $mensaje = '¡El sorteo se ha realizado correctamente!';
+        $mensaje = "¡Sorteo realizado! Se seleccionaron {$numeroGanadores} ganador(es).";
         if ($emailsEnviados > 0) {
             $mensaje .= " Se han enviado {$emailsEnviados} notificaciones.";
         }
         if ($emailsFallidos > 0) {
             $mensaje .= " (Hubo {$emailsFallidos} emails que no se pudieron enviar)";
         }
-        
+
         $this->addFlash('success', $mensaje);
 
         return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);

@@ -27,6 +27,13 @@ class SorteoType extends AbstractType
                 'label' => 'Participantes Ilimitados',
                 'required' => false,
             ])
+            ->add('numeroGanadores', IntegerType::class, [
+                'label' => 'Número de ganadores',
+                'required' => true,
+                'attr' => [
+                    'min' => 1
+                ]
+            ])
             ->add('maxParticipantes', IntegerType::class, [
                 'label' => 'Máximo de participantes',
                 'required' => false,

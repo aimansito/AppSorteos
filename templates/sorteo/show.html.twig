@@ -78,6 +78,7 @@
                 {% else %}
                     <p><strong>Máx participantes:</strong> {{ sorteo.maxParticipantes }}</p>
                 {% endif %}
+                <p><strong>Número de ganadores:</strong> {{ sorteo.numeroGanadores }}</p>
             </div>
 
             <h3 class="raffle-subtitle">Participantes ({{ participantes|length }})</h3>
@@ -93,6 +94,7 @@
                                 <th>Correo Electrónico</th>
                                 <th>Código</th>
                                 <th class="text-center">Ganador</th>
+                                <th class="text-center">Puesto</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -106,6 +108,13 @@
                                             <span class="winner-tag">SÍ</span>
                                         {% else %}
                                             No
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if participante.esGanador %}
+                                            {{ participante.puesto }}º
+                                        {% else %}
+                                            -
                                         {% endif %}
                                     </td>
                                 </tr>

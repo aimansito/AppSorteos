@@ -29,6 +29,9 @@ class Historico
     #[ORM\JoinColumn(nullable: false)]
     private ?Sorteo $sorteo = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $puesto = null;
+
     // Getters y setters
 
     public function getId(): ?int
@@ -77,6 +80,17 @@ class Historico
     public function setSorteo(?Sorteo $sorteo): static
     {
         $this->sorteo = $sorteo;
+        return $this;
+    }
+
+    public function getPuesto(): ?int
+    {
+        return $this->puesto;
+    }
+
+    public function setPuesto(?int $puesto): static
+    {
+        $this->puesto = $puesto;
         return $this;
     }
 }

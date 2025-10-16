@@ -40,12 +40,16 @@ class Sorteo
     #[ORM\Column]
     private bool $activo = true;
 
+    #[ORM\Column]
+    private int $numeroGanadores = 1;
+
     #[ORM\OneToMany(mappedBy: 'sorteo', targetEntity: Participante::class, cascade: ['persist', 'remove'])]
     private Collection $participantes;
 
     public function __construct()
     {
         $this->participantes = new ArrayCollection();
+        $this->numeroGanadores = 1;
     }
 
     public function getId(): ?int
@@ -127,6 +131,17 @@ class Sorteo
     public function setActivo(bool $activo): static
     {
         $this->activo = $activo;
+        return $this;
+    }
+
+    public function getNumeroGanadores(): int
+    {
+        return $this->numeroGanadores;
+    }
+
+    public function setNumeroGanadores(int $numeroGanadores): static
+    {
+        $this->numeroGanadores = max(1, $numeroGanadores);
         return $this;
     }
 
