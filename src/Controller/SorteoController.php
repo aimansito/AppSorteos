@@ -154,14 +154,26 @@ class SorteoController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $existe = $em->getRepository(Participante::class)->findOneBy([
+            // Verificar si ya existe un participante con el mismo email en este sorteo
+            $existeEmail = $em->getRepository(Participante::class)->findOneBy([
                 'sorteo' => $sorteo,
                 'email' => $participante->getEmail()
             ]);
 
-            if ($existe) {
+            if ($existeEmail) {
                 $this->addFlash('warning', 'Ya estás apuntado a este sorteo con este email.');
                 return $this->redirectToRoute('app_main');
+            }
+
+            // Verificar si ya existe un participante con el mismo código en este sorteo
+            $existeCodigo = $em->getRepository(Participante::class)->codigoExisteEnSorteo(
+                $participante->getCodigoEntrada(),
+                $sorteo->getId()
+            );
+
+            if ($existeCodigo) {
+                $this->addFlash('warning', 'Este código de entrada ya existe en este sorteo. Por favor, utiliza un código diferente.');
+                return $this->redirectToRoute('app_sorteo_apuntarse', ['id' => $sorteo->getId()]);
             }
 
             if (!$sorteo->tienePlazasDisponibles()) {

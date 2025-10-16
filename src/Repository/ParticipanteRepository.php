@@ -16,14 +16,25 @@ class ParticipanteRepository extends ServiceEntityRepository
         parent::__construct($registry, Participante::class);
     }
 
+    public function codigoExisteEnSorteo(string $codigo, int $sorteoId): bool
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.codigoEntrada = :codigo')
+            ->andWhere('IDENTITY(p.sorteo) = :sorteoId')
+            ->setParameter('codigo', $codigo)
+            ->setParameter('sorteoId', $sorteoId)
+            ->getQuery()
+            ->getOneOrNullResult() !== null;
+    }
+
 //    /**
 //     * @return Participante[] Returns an array of Participante objects
 //     */
-//    public function findByExampleField($value): array
+//    public function findByExampleField(\$value): array
 //    {
-//        return $this->createQueryBuilder('p')
+//        return \$this->createQueryBuilder('p')
 //            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
+//            ->setParameter('val', \$value)
 //            ->orderBy('p.id', 'ASC')
 //            ->setMaxResults(10)
 //            ->getQuery()
@@ -31,11 +42,11 @@ class ParticipanteRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Participante
+//    public function findOneBySomeField(\$value): ?Participante
 //    {
-//        return $this->createQueryBuilder('p')
+//        return \$this->createQueryBuilder('p')
 //            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
+//            ->setParameter('val', \$value)
 //            ->getQuery()
 //            ->getOneOrNullResult()
 //        ;

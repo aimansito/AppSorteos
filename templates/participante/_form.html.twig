@@ -14,9 +14,48 @@
 
     <div class="mb-3">
         {{ form_row(form.codigoEntrada, {
-            'attr': {'class': 'form-control form-control-lg form-control-yellow'}
+            'attr': {'class': 'form-control form-control-lg form-control-yellow', 'id': 'codigoEntrada'}
         }) }}
+        <div id="codigo-error" class="text-danger" style="display: none;"></div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const codigoInput = document.getElementById('codigoEntrada');
+            const codigoError = document.getElementById('codigo-error');
+            const form = document.querySelector('form');
+            
+            // Validación en tiempo real
+            codigoInput.addEventListener('blur', function() {
+                const codigo = this.value.trim();
+                if (codigo) {
+                    // Aquí podrías agregar una llamada AJAX para verificar en tiempo real
+                    // Por ahora solo validamos que no esté vacío
+                    if (codigo.length < 2) {
+                        codigoError.textContent = 'El código debe tener al menos 2 caracteres';
+                        codigoError.style.display = 'block';
+                    } else {
+                        codigoError.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Validación antes de enviar el formulario
+            form.addEventListener('submit', function(e) {
+                const codigo = codigoInput.value.trim();
+                if (!codigo) {
+                    e.preventDefault();
+                    alert('Por favor, ingresa un código de entrada');
+                    codigoInput.focus();
+                } else if (codigo.length < 2) {
+                    e.preventDefault();
+                    codigoError.textContent = 'El código debe tener al menos 2 caracteres';
+                    codigoError.style.display = 'block';
+                    codigoInput.focus();
+                }
+            });
+        });
+    </script>
 
     <div class="d-flex justify-content-center gap-3 mt-4"> 
         <button type="submit" class="btn btn-success">
