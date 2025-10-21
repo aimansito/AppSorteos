@@ -51,50 +51,43 @@
 
 {% block body %}
     <div class="full-width-form-container">
-        {% if is_granted('ROLE_ADMIN') %}
 
-            <h1>Registro</h1>
-            <hr>
+        <h1>Registro</h1>
+        <hr>
 
-            {{ form_errors(registrationForm) }}
+        {{ form_errors(registrationForm) }}
 
-            {{ form_start(registrationForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+        {{ form_start(registrationForm, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+        
+            <div class="mb-3">
+                {{ form_row(registrationForm.username, {
+                    'attr': {'class': 'form-control form-control-lg form-control-yellow'}
+                }) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_row(registrationForm.plainPassword, {
+                    label: 'Contraseña',
+                    'attr': {'class': 'form-control form-control-lg form-control-yellow'}
+                }) }}
+            </div>
+
+            <div class="mb-3">
+                <div class="form-check">
+                    {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                    {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                </div>
+                {{ form_errors(registrationForm.agreeTerms) }}
+            </div>
             
-                <div class="mb-3">
-                    {{ form_row(registrationForm.username, {
-                        'attr': {'class': 'form-control form-control-lg form-control-yellow'}
-                    }) }}
-                </div>
+        
 
-                <div class="mb-3">
-                    {{ form_row(registrationForm.plainPassword, {
-                        label: 'Contraseña',
-                        'attr': {'class': 'form-control form-control-lg form-control-yellow'}
-                    }) }}
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check">
-                        {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
-                        {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label'}}) }}
-                    </div>
-                    {{ form_errors(registrationForm.agreeTerms) }}
-                </div>
-                
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-custom-blue btn-lg text-white">
+                    Registrarse
+                </button>
+            </div>
             
-
-                <div class="d-grid mt-4">
-                    <button type="submit" class="btn btn-custom-blue btn-lg text-white">
-                        Registrarse
-                    </button>
-                </div>
-                
-            {{ form_end(registrationForm) }}
-    {% else %}
-        <h1>Necesitas permisos de Administrador</h1>
-        <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
-            Volver al Listado
-        </a>
-    {% endif %}
+        {{ form_end(registrationForm) }}
     </div>
 {% endblock %}

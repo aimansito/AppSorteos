@@ -47,7 +47,7 @@
                 <td>{{ sorteo.nombreActividad }}</td>
                 <td>{{ sorteo.fecha ? sorteo.fecha|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ sorteo.lugar }}</td>
-                <td>{{ sorteo.maxParticipantes }}</td>
+                <td>{{ sorteo.maxParticipantes ? sorteo.maxParticipantes : 'Ilimitados' }}</td>
                 <td>
                     <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}">Mostrar</a>
                     <a href="{{ path('app_sorteo_edit', {'id': sorteo.id}) }}">Editar</a>

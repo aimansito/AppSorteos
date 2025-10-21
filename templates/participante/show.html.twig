@@ -56,55 +56,46 @@
             width: 200px;
         }
     </style>
-    {% if is_granted('ROLE_ADMIN') %}
-        <h1>Detalles del Participante</h1>
+    <h1>Detalles del Participante</h1>
 
-        <table class="table table-striped">
-            <tbody>
-                <tr>
-                    <th>Id</th>
-                    <td>{{ participante.id }}</td>
-                </tr>
-                <tr>
-                    <th>Nombre</th>
-                    <td>{{ participante.nombre }}</td>
-                </tr>
-                <tr>
-                    <th>Email</th>
-                    <td>{{ participante.email }}</td>
-                </tr>
-                <tr>
-                    <th>Código de entrada</th>
-                    <td>{{ participante.codigoEntrada }}</td>
-                </tr>
-                <tr>
-                    <th>Ganador</th>
-                    <td>{{ participante.esGanador ? 'Sí' : 'No' }}</td>
-                </tr>
-            </tbody>
-        </table>
+    <table class="table table-striped">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ participante.id }}</td>
+            </tr>
+            <tr>
+                <th>Nombre</th>
+                <td>{{ participante.nombre }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ participante.email }}</td>
+            </tr>
+            <tr>
+                <th>Código de entrada</th>
+                <td>{{ participante.codigoEntrada }}</td>
+            </tr>
+            <tr>
+                <th>Ganador</th>
+                <td>{{ participante.esGanador ? 'Sí' : 'No' }}</td>
+            </tr>
+        </tbody>
+    </table>
 
-        <div class="mt-3">
-            <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
-                Volver al Listado
-            </a>
-
-            <a href="{{ path('app_participante_edit', {'id': participante.id}) }}" class="btn btn-editar">
-                Editar
-            </a>
-
-            {# Botón de eliminar en POST con CSRF #}
-            <form method="post" action="{{ path('app_participante_delete', {'id': participante.id}) }}" style="display:inline-block;" onsubmit="return confirm('¿Seguro que deseas eliminar este participante?');">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participante.id) }}">
-                <button type="submit" class="btn btn-eliminar">Eliminar</button>
-            </form>
-        </div>
-
-    {% else %}
-        <h1>Acceso restringido</h1>
-        <p>Necesitas permisos de <strong>Administrador</strong> para ver esta página.</p>
+    <div class="mt-3">
         <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
             Volver al Listado
         </a>
-    {% endif %}
+
+        <a href="{{ path('app_participante_edit', {'id': participante.id}) }}" class="btn btn-editar">
+            Editar
+        </a>
+
+        {# Botón de eliminar en POST con CSRF #}
+        <form method="post" action="{{ path('app_participante_delete', {'id': participante.id}) }}" style="display:inline-block;" onsubmit="return confirm('¿Seguro que deseas eliminar este participante?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participante.id) }}">
+            <button type="submit" class="btn btn-eliminar">Eliminar</button>
+        </form>
+    </div>
 {% endblock %}

@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/participante')]
 final class ParticipanteController extends AbstractController
@@ -24,6 +25,7 @@ final class ParticipanteController extends AbstractController
     }
 
     #[Route('/new', name: 'app_participante_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $participante = new Participante();
@@ -49,6 +51,7 @@ final class ParticipanteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_participante_show', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function show(Participante $participante): Response
     {
         return $this->render('participante/show.html.twig', [
@@ -57,6 +60,7 @@ final class ParticipanteController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_participante_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, Participante $participante, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ParticipanteType::class, $participante);
@@ -79,6 +83,7 @@ final class ParticipanteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_participante_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Participante $participante, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$participante->getId(), $request->getPayload()->getString('_token'))) {

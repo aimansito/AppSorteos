@@ -45,9 +45,6 @@
         
     </style>
 
-
-    {% if is_granted('ROLE_ADMIN') %}
-
         <h1>Editar Participante</h1>
 
         <div class="mt-4">
@@ -64,11 +61,4 @@
             {{ include('participante/_delete_form.html.twig') }}
         </div>
 
-        
-    {% else %}
-        <h1>Necesitas permisos de Administrador</h1>
-        <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
-            Volver al Listado
-        </a>
-    {% endif %}
 {% endblock %}

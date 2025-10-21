@@ -88,18 +88,8 @@
 
 {% block body %}
     <div class="full-width-form-container">
-        {% if is_granted('ROLE_ADMIN') %}
-            
-            
-            <h1>Creación del Sorteo</h1>
+        <h1>Creación del Sorteo</h1>
 
-            {{ include('sorteo/_form.html.twig') }}
-        
-        {% else %}
-            <h1>Necesitas permisos de Administrador</h1>
-            <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
-                Volver al Listado
-            </a>
-        {% endif %}
+        {{ include('sorteo/_form.html.twig') }}
     </div>
 {% endblock %}

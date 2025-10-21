@@ -12,15 +12,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'app_register')]
+    #[IsGranted('ROLE_ADMIN')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
-        
+
         // $project = new Project();
         // $project->setOwner($user);
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -33,17 +35,12 @@ class RegistrationController extends AbstractController
             // encode the plain password
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
-           
-            
             $user->setRoles(['ROLE_ADMIN']);
-            
+
 
             $entityManager->persist($user);
             $entityManager->flush();
 
-           
-
-          
             return $this->redirectToRoute('app_login');
         }
 

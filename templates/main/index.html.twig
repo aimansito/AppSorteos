@@ -222,7 +222,6 @@
         <strong>Plazas restantes: </strong>{{ sorteo.getPlazasRestantes() }}<br>
     {% endif %}
 
-    {# --- Botón central Unirse / Completo --- #}
     <div class="sorteo-actions">
         {% if sorteo.tienePlazasDisponibles() %}
             <a href="{{ path('app_sorteo_apuntarse', {'id': sorteo.id}) }}" class="btn btn-success">Unirse</a>
@@ -231,7 +230,6 @@
         {% endif %}
     </div>
 
-    {# --- Botones adicionales alineados a la izquierda (solo para sesión con admin) --- #}
     {% if is_granted('ROLE_ADMIN') %}
         <div class="admin-buttons">
             <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
@@ -249,7 +247,6 @@
 
     {% endif %}
 
-    {# --- Sección de sorteos ocultos para administradores --- #}
     {% if is_granted('ROLE_ADMIN') and sorteosInactivos is not empty %}
         <div style="margin-top: 40px;">
             <details>

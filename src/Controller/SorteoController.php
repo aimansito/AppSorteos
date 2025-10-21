@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -30,6 +31,7 @@ class SorteoController extends AbstractController
     public function __construct(private SluggerInterface $slugger) {}
 
     #[Route(name: 'app_sorteo_index', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function index(SorteoRepository $sorteoRepository): Response
     {
         return $this->render('sorteo/index.html.twig', [
@@ -38,6 +40,7 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/new', name: 'app_sorteo_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): Response
     {
         $sorteo = new Sorteo();
@@ -48,6 +51,10 @@ class SorteoController extends AbstractController
             // Si participantes ilimitados está activado, establecer maxParticipantes a null
             if ($sorteo->isParticipantesIlimitados()) {
                 $sorteo->setMaxParticipantes(null);
+            }
+
+            if($sorteo->getMaxParticipantes() == 0) {
+                $sorteo->setParticipantesIlimitados(true);
             }
 
             $imagenFile = $form->get('imagenFile')->getData();
@@ -94,6 +101,7 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_sorteo_show', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function show(Sorteo $sorteo): Response
     {
         return $this->render('sorteo/show.html.twig', [
@@ -103,6 +111,7 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_sorteo_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(SorteoType::class, $sorteo);
@@ -134,6 +143,7 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_sorteo_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
     {
         if ($this->isCsrfTokenValid('delete' . $sorteo->getId(), $request->request->get('_token'))) {
@@ -196,6 +206,7 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/{id}/sortear', name: 'app_sorteo_sortear', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function sortear(Request $request, Sorteo $sorteo, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
         // Verificar CSRF
@@ -326,6 +337,7 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/{id}/restaurar', name: 'app_sorteo_restaurar', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function restaurar(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
     {
         if ($this->isCsrfTokenValid('restaurar' . $sorteo->getId(), $request->request->get('_token'))) {
