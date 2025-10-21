@@ -232,7 +232,16 @@ class SorteoController extends AbstractController
         // Seleccionar múltiples ganadores en una sola acción
         $numeroGanadores = max(1, $sorteo->getNumeroGanadores());
         $totalParticipantes = count($participantes);
-        $numeroGanadores = min($numeroGanadores, $totalParticipantes);
+
+        // Bloquear sorteo si no hay suficientes participantes para el número de ganadores configurado
+        if ($totalParticipantes < $numeroGanadores) {
+            $this->addFlash('warning', sprintf(
+                'No hay suficientes participantes para sortear %d ganador(es). Actualmente hay %d participante(s).',
+                $numeroGanadores,
+                $totalParticipantes
+            ));
+            return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
+        }
 
         // Mezclar participantes y tomar los primeros N
         shuffle($participantes);

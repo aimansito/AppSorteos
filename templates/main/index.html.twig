@@ -247,6 +247,42 @@
 
     {% endif %}
 
+    {% if is_granted('ROLE_ADMIN') and sorteosPendientes is not empty %}
+        <div style="margin-top: 40px;">
+            <details>
+                <summary style="cursor: pointer; background-color: #fff3cd; padding: 10px 15px; border: 1px solid #ffeeba; border-radius: 5px; font-weight: bold; color: #856404;">
+                    ⚠️ Sorteos Pendientes de Sortear ({{ sorteosPendientes|length }})
+                </summary>
+                
+                <ul class="sorteo-list" style="margin-top: 15px;">
+                {% for sorteo in sorteosPendientes %}
+                    <li style="border-left-color: #ffc107; background-color: #fff3cd;">
+                        {% if sorteo.imagen is not empty %}
+                            <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="sorteo-imagen">
+                        {% endif %}
+                        <h4>{{ sorteo.nombreActividad }}</h4><br>
+                        <strong>Fecha: </strong>{{ sorteo.fecha|date('d/m/Y H:i') }}<br>
+                        <strong>Lugar: </strong>{{ sorteo.lugar }}<br>
+                        {% if sorteo.participantesIlimitados %}
+                            <strong>Participantes: </strong>Ilimitados<br>
+                        {% else %}
+                            <strong>Máx participantes: </strong>{{ sorteo.maxParticipantes }}<br>
+                        {% endif %}
+
+                        <div class="admin-buttons">
+                            <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Sorteo</a>
+                            <form method="post" action="{{ path('app_sorteo_sortear', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres sortear este sorteo ahora?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('sortear' ~ sorteo.id) }}">
+                                <button class="btn btn-success">Sortear</button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            </details>
+        </div>
+    {% endif %}
+
     {% if is_granted('ROLE_ADMIN') and sorteosInactivos is not empty %}
         <div style="margin-top: 40px;">
             <details>
@@ -257,6 +293,9 @@
                 <ul class="sorteo-list" style="margin-top: 15px;">
                 {% for sorteo in sorteosInactivos %}
                     <li style="border-left-color: #6c757d; background-color: #f8f9fa;">
+                        {% if sorteo.imagen is not empty %}
+                            <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="sorteo-imagen">
+                        {% endif %}
                         <h4>{{ sorteo.nombreActividad }}</h4><br>
                         <strong>Fecha: </strong>{{ sorteo.fecha|date('d/m/Y H:i') }}<br>
                         <strong>Lugar: </strong>{{ sorteo.lugar }}<br>
@@ -271,6 +310,39 @@
                             <form method="post" action="{{ path('app_sorteo_restaurar', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres restaurar este sorteo?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('restaurar' ~ sorteo.id) }}">
                                 <button class="btn btn-success">Restaurar</button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            </details>
+        </div>
+    {% endif %}
+
+    {% if is_granted('ROLE_ADMIN') and sorteosPendientes is not empty and false %}
+        <div style="margin-top: 40px;">
+            <details>
+                <summary style="cursor: pointer; background-color: #f8f9fa; padding: 10px 15px; border: 1px solid #dee2e6; border-radius: 5px; font-weight: bold; color: #6c757d;">
+                    📁 Sorteos Pendientes de Sortear ({{ sorteosPendientes|length }})
+                </summary>
+                
+                <ul class="sorteo-list" style="margin-top: 15px;">
+                {% for sorteo in sorteosPendientes %}
+                    <li style="border-left-color: #6c757d; background-color: #f8f9fa;">
+                        <h4>{{ sorteo.nombreActividad }}</h4><br>
+                         <strong>Fecha: </strong>{{ sorteo.fecha|date('d/m/Y H:i') }}<br>
+                          <strong>Lugar: </strong>{{ sorteo.lugar }}<br>
+                        {% if sorteo.participantesIlimitados %}
+                            <strong>Participantes: </strong>Ilimitados<br>
+                        {% else %}
+                            <strong>Máx participantes: </strong>{{ sorteo.maxParticipantes }}<br>
+                        {% endif %}
+
+                        <div class="admin-buttons">
+                            <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Sorteo</a>
+                            <form method="post" action="{{ path('app_sorteo_sortear', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres sortear este sorteo ahora?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('sortear' ~ sorteo.id) }}">
+                                <button class="btn btn-success">Sortear</button>
                             </form>
                         </div>
                     </li>

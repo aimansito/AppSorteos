@@ -94,6 +94,7 @@
                             <th>Código</th>
                             <th class="text-center">Ganador</th>
                             <th class="text-center">Puesto</th>
+                            <th class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -115,6 +116,13 @@
                                     {% else %}
                                         -
                                     {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <form method="post" action="{{ path('app_participante_delete', {'id': participante.id}) }}" onsubmit="return confirm('¿Seguro que quieres eliminar a este participante del sorteo?');" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participante.id) }}">
+                                        <input type="hidden" name="redirect_to_sorteo" value="{{ sorteo.id }}">
+                                        <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                    </form>
                                 </td>
                             </tr>
                         {% endfor %}

@@ -14,15 +14,18 @@ class MainController extends AbstractController
     {
         $sorteos = $sorteoRepository->findActivos();
         $sorteosInactivos = [];
+        $sorteosPendientes = [];
 
-        // Solo cargar sorteos inactivos para administradores
+        // Solo cargar sorteos inactivos y pendientes para administradores
         if ($this->isGranted('ROLE_ADMIN')) {
             $sorteosInactivos = $sorteoRepository->findInactivos();
+            $sorteosPendientes = $sorteoRepository->findPendientes();
         }
 
         return $this->render('main/index.html.twig', [
             'sorteos' => $sorteos,
             'sorteosInactivos' => $sorteosInactivos,
+            'sorteosPendientes' => $sorteosPendientes,
         ]);
     }
 }

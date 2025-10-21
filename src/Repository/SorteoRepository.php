@@ -39,6 +39,21 @@ class SorteoRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findPendientes(): array
+    {
+        $ahora = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Madrid'));
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.participantes', 'p', 'WITH', 'p.esGanador = true')
+            ->where('s.fecha <= :ahora')
+            ->andWhere('s.activo = :activo')
+            ->andWhere('p.id IS NULL')
+            ->setParameter('ahora', $ahora)
+            ->setParameter('activo', true)
+            ->orderBy('s.fecha', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
 
     //    /**
     //     * @return Sorteo[] Returns an array of Sorteo objects

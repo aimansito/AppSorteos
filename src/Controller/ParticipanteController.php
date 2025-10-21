@@ -86,10 +86,21 @@ final class ParticipanteController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Participante $participante, EntityManagerInterface $entityManager): Response
     {
+        // Identificar si la petición proviene del detalle del sorteo
+        $sorteoId = $request->request->getInt('redirect_to_sorteo');
+        $perteneceAlSorteo = $participante->getSorteo() && $participante->getSorteo()->getId() === $sorteoId;
+
         if ($this->isCsrfTokenValid('delete'.$participante->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($participante);
             $entityManager->flush();
             $this->addFlash('success', 'El participante se eliminó correctamente.');
+        }
+
+        if ($sorteoId > 0) {
+            if (!$perteneceAlSorteo) {
+                $this->addFlash('warning', 'El participante eliminado no pertenecía al sorteo indicado.');
+            }
+            return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteoId], Response::HTTP_SEE_OTHER);
         }
 
         return $this->redirectToRoute('app_participante_index', [], Response::HTTP_SEE_OTHER);
