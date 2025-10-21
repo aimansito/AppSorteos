@@ -232,7 +232,7 @@
 
     {% if is_granted('ROLE_ADMIN') %}
         <div class="admin-buttons">
-            <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
+            <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Sorteo</a>
             <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres ocultar este sorteo?');">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sorteo.id) }}">
                 <button class="btn btn-danger">Ocultar</button>
@@ -267,7 +267,7 @@
                         {% endif %}
                         
                         <div class="admin-buttons">
-                            <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Participantes</a>
+                            <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Sorteo</a>
                             <form method="post" action="{{ path('app_sorteo_restaurar', {'id': sorteo.id}) }}" style="display:inline;" onsubmit="return confirm('¿Seguro que quieres restaurar este sorteo?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('restaurar' ~ sorteo.id) }}">
                                 <button class="btn btn-success">Restaurar</button>
