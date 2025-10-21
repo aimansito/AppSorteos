@@ -19,8 +19,12 @@ class SorteoType extends AbstractType
     {
         $builder
             ->add('nombreActividad')
-            ->add('fecha', null, [
-                'widget' => 'single_text'
+            ->add('fecha', \Symfony\Component\Form\Extension\Core\Type\DateTimeType::class, [
+                'widget' => 'single_text',
+                'label' => 'Fecha del sorteo',
+                'model_timezone' => 'Europe/Madrid',
+                'view_timezone' => 'Europe/Madrid',
+                'html5' => true,
             ])
             ->add('lugar')
             ->add('participantesIlimitados', CheckboxType::class, [

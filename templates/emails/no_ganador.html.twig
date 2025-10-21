@@ -33,8 +33,22 @@
             font-size: 50px;
             margin-bottom: 10px;
         }
+        .sorteo-image {
+            width: 100%;
+            max-width: 540px;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
         .content {
             padding: 40px 30px;
+        }
+        .content h2 {
+            color: #f5576c;
+            margin-top: 0;
+            text-align: center;
         }
         .footer {
             background: #f8f9fa;
@@ -56,6 +70,12 @@
             <p>Hola {{ participante.nombre }},</p>
             
             <p>Gracias por participar en el sorteo <strong>{{ sorteo.nombreActividad }}</strong>.</p>
+            
+            {% if tieneImagen %}
+                <img src="cid:sorteo_image" 
+                     alt="{{ sorteo.nombreActividad }}" 
+                     class="sorteo-image">
+            {% endif %}
             
             <p>En esta ocasión el sorteo ya tiene ganador, pero no te preocupes, ¡habrá más oportunidades!</p>
             

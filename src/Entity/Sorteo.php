@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Participante;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: SorteoRepository::class)]
 class Sorteo
@@ -22,7 +23,11 @@ class Sorteo
     private ?string $nombreActividad = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\GreaterThanOrEqual("now", message: "La fecha del sorteo debe ser igual o posterior a la fecha actual.")]
+    #[Assert\NotBlank(message: 'La fecha no puede estar vacía.')]
+    #[Assert\GreaterThan(
+        'now',
+        message: 'La fecha debe ser posterior al momento actual.'
+    )]
     private ?\DateTimeInterface $fecha = null;
 
     #[ORM\Column(length: 255)]
@@ -50,6 +55,30 @@ class Sorteo
     {
         $this->participantes = new ArrayCollection();
         $this->numeroGanadores = 1;
+    }
+
+    // NUEVA VALIDACIÓN CON TIMEZONE CORRECTO
+    #[Assert\Callback]
+    public function validateFecha(ExecutionContextInterface $context): void
+    {
+        if ($this->fecha === null) {
+            return;
+        }
+        
+        // Crear fecha actual en timezone de Madrid
+        $ahora = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Madrid'));
+        
+        // Convertir la fecha del sorteo a DateTimeImmutable si es necesario
+        $fechaSorteo = $this->fecha instanceof \DateTimeImmutable 
+            ? $this->fecha 
+            : \DateTimeImmutable::createFromMutable($this->fecha);
+        
+        // Comparar usando timestamps
+        if ($fechaSorteo->getTimestamp() < $ahora->getTimestamp()) {
+            $context->buildViolation('La fecha y hora del sorteo deben ser iguales o posteriores al momento actual.')
+                ->atPath('fecha')
+                ->addViolation();
+        }
     }
 
     public function getId(): ?int
@@ -176,14 +205,14 @@ class Sorteo
 
     public function getPlazasRestantes(): int {
         if ($this->participantesIlimitados) {
-            return PHP_INT_MAX; // Valor máximo para representar "ilimitado"
+            return PHP_INT_MAX;
         }
         return $this->maxParticipantes - count($this->participantes);
     }
 
     public function tienePlazasDisponibles(): bool {
         if ($this->participantesIlimitados) {
-            return true; // Siempre hay plazas disponibles si es ilimitado
+            return true;
         }
         return $this->getPlazasRestantes() > 0; 
     }

@@ -33,6 +33,15 @@
             font-size: 60px;
             margin-bottom: 10px;
         }
+        .sorteo-image {
+            width: 100%;
+            max-width: 540px;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
         .content {
             padding: 40px 30px;
         }
@@ -69,6 +78,12 @@
             <p>Nos complace enormemente informarte que <strong>¡HAS GANADO!</strong></p>
             
             <h2>{{ sorteo.nombreActividad }}</h2>
+            
+            {% if tieneImagen %}
+                <img src="cid:sorteo_image" 
+                     alt="{{ sorteo.nombreActividad }}" 
+                     class="sorteo-image">
+            {% endif %}
             
             <div class="info-box">
                 <p><strong>📅 Fecha:</strong> {{ sorteo.fecha|date('d/m/Y H:i') }}</p>

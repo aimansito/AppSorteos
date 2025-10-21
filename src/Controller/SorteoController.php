@@ -247,6 +247,15 @@ class SorteoController extends AbstractController
 
         $em->flush();
 
+        // Preparar ruta de imagen si existe
+        $imagePath = null;
+        if ($sorteo->getImagen()) {
+            $imagePath = $this->getParameter('kernel.project_dir') . '/public/uploads/sorteos/' . $sorteo->getImagen();
+            if (!file_exists($imagePath)) {
+                $imagePath = null; // Si no existe el archivo, no intentar adjuntarlo
+            }
+        }
+
         // Enviar emails a ganadores
         foreach ($ganadores as $ganador) {
             try {
@@ -256,8 +265,14 @@ class SorteoController extends AbstractController
                     ->subject('¡Felicidades! Has ganado: ' . $sorteo->getNombreActividad())
                     ->html($this->renderView('emails/ganador.html.twig', [
                         'ganador' => $ganador,
-                        'sorteo' => $sorteo
+                        'sorteo' => $sorteo,
+                        'tieneImagen' => $imagePath !== null
                     ]));
+
+                // Adjuntar imagen si existe
+                if ($imagePath) {
+                    $emailGanador->embedFromPath($imagePath, 'sorteo_image');
+                }
 
                 $mailer->send($emailGanador);
                 $emailsEnviados++;
@@ -279,8 +294,14 @@ class SorteoController extends AbstractController
                         ->subject('Resultado del sorteo: ' . $sorteo->getNombreActividad())
                         ->html($this->renderView('emails/no_ganador.html.twig', [
                             'participante' => $p,
-                            'sorteo' => $sorteo
+                            'sorteo' => $sorteo,
+                            'tieneImagen' => $imagePath !== null
                         ]));
+
+                    // Adjuntar imagen si existe
+                    if ($imagePath) {
+                        $emailPerdedor->embedFromPath($imagePath, 'sorteo_image');
+                    }
 
                     $mailer->send($emailPerdedor);
                     $emailsEnviados++;
