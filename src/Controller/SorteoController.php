@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -31,7 +30,6 @@ class SorteoController extends AbstractController
     public function __construct(private SluggerInterface $slugger) {}
 
     #[Route(name: 'app_sorteo_index', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN')]
     public function index(SorteoRepository $sorteoRepository): Response
     {
         return $this->render('sorteo/index.html.twig', [
@@ -40,7 +38,6 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/new', name: 'app_sorteo_new', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): Response
     {
         $sorteo = new Sorteo();
@@ -48,13 +45,9 @@ class SorteoController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-           
+            // Si participantes ilimitados está activado, establecer maxParticipantes a null
             if ($sorteo->isParticipantesIlimitados()) {
                 $sorteo->setMaxParticipantes(null);
-            }
-
-            if($sorteo->getMaxParticipantes() == 0) {
-                $sorteo->setParticipantesIlimitados(true);
             }
 
             $imagenFile = $form->get('imagenFile')->getData();
@@ -101,7 +94,6 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_sorteo_show', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN')]
     public function show(Sorteo $sorteo): Response
     {
         return $this->render('sorteo/show.html.twig', [
@@ -111,7 +103,6 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_sorteo_edit', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(SorteoType::class, $sorteo);
@@ -126,7 +117,7 @@ class SorteoController extends AbstractController
                 ]);
             }
             
-           
+            // Si participantes ilimitados está activado, establecer maxParticipantes a null
             if ($sorteo->isParticipantesIlimitados()) {
                 $sorteo->setMaxParticipantes(null);
             }
@@ -143,11 +134,10 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_sorteo_delete', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
     {
         if ($this->isCsrfTokenValid('delete' . $sorteo->getId(), $request->request->get('_token'))) {
-           
+            // Cambiar el estado a false en lugar de eliminar
             $sorteo->setActivo(false);
             $em->flush();
             $this->addFlash('success', 'Sorteo ocultado correctamente.');
@@ -164,7 +154,7 @@ class SorteoController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            
+            // Verificar si ya existe un participante con el mismo email en este sorteo
             $existeEmail = $em->getRepository(Participante::class)->findOneBy([
                 'sorteo' => $sorteo,
                 'email' => $participante->getEmail()
@@ -175,7 +165,7 @@ class SorteoController extends AbstractController
                 return $this->redirectToRoute('app_main');
             }
 
-            
+            // Verificar si ya existe un participante con el mismo código en este sorteo
             $existeCodigo = $em->getRepository(Participante::class)->codigoExisteEnSorteo(
                 $participante->getCodigoEntrada(),
                 $sorteo->getId()
@@ -205,23 +195,22 @@ class SorteoController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/sortear', name: 'app_sorteo_sortear', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+   #[Route('/{id}/sortear', name: 'app_sorteo_sortear', methods: ['POST'])]
     public function sortear(Request $request, Sorteo $sorteo, EntityManagerInterface $em, MailerInterface $mailer): Response
     {
-        
+        // Verificar CSRF
         if (!$this->isCsrfTokenValid('sortear'.$sorteo->getId(), $request->request->get('_token'))) {
             $this->addFlash('error', 'Token CSRF inválido.');
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
-       
+        // Verificar si ya hay ganadores previamente
         if ($sorteo->getParticipantes()->exists(fn($i, $p) => $p->isEsGanador())) {
             $this->addFlash('warning', 'Ya se han seleccionado ganadores en este sorteo.');
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
-       
+        // Obtener participantes
         $participantes = $sorteo->getParticipantes()->toArray();
 
         if (empty($participantes)) {
@@ -229,28 +218,19 @@ class SorteoController extends AbstractController
             return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
         }
 
-       
+        // Seleccionar múltiples ganadores en una sola acción
         $numeroGanadores = max(1, $sorteo->getNumeroGanadores());
         $totalParticipantes = count($participantes);
+        $numeroGanadores = min($numeroGanadores, $totalParticipantes);
 
-        
-        if ($totalParticipantes < $numeroGanadores) {
-            $this->addFlash('warning', sprintf(
-                'No hay suficientes participantes para sortear %d ganador(es). Actualmente hay %d participante(s).',
-                $numeroGanadores,
-                $totalParticipantes
-            ));
-            return $this->redirectToRoute('app_sorteo_show', ['id' => $sorteo->getId()]);
-        }
-
-        
+        // Mezclar participantes y tomar los primeros N
         shuffle($participantes);
         $ganadores = array_slice($participantes, 0, $numeroGanadores);
 
         $emailsEnviados = 0;
         $emailsFallidos = 0;
 
-        
+        // Marcar ganadores, asignar puesto y crear historial para cada uno
         foreach ($ganadores as $idx => $ganador) {
             $ganador->setEsGanador(true);
             $ganador->setPuesto($idx + 1);
@@ -267,16 +247,16 @@ class SorteoController extends AbstractController
 
         $em->flush();
 
-        
+        // Preparar ruta de imagen si existe
         $imagePath = null;
         if ($sorteo->getImagen()) {
             $imagePath = $this->getParameter('kernel.project_dir') . '/public/uploads/sorteos/' . $sorteo->getImagen();
             if (!file_exists($imagePath)) {
-                $imagePath = null; 
+                $imagePath = null; // Si no existe el archivo, no intentar adjuntarlo
             }
         }
 
-       
+        // Enviar emails a ganadores
         foreach ($ganadores as $ganador) {
             try {
                 $emailGanador = (new Email())
@@ -289,7 +269,7 @@ class SorteoController extends AbstractController
                         'tieneImagen' => $imagePath !== null
                     ]));
 
-               
+                // Adjuntar imagen si existe
                 if ($imagePath) {
                     $emailGanador->embedFromPath($imagePath, 'sorteo_image');
                 }
@@ -301,7 +281,7 @@ class SorteoController extends AbstractController
             }
         }
 
-        
+        // Enviar emails a los no ganadores
         $ganadoresSet = new \SplObjectStorage();
         foreach ($ganadores as $g) { $ganadoresSet->attach($g); }
 
@@ -318,7 +298,7 @@ class SorteoController extends AbstractController
                             'tieneImagen' => $imagePath !== null
                         ]));
 
-                   
+                    // Adjuntar imagen si existe
                     if ($imagePath) {
                         $emailPerdedor->embedFromPath($imagePath, 'sorteo_image');
                     }
@@ -331,7 +311,7 @@ class SorteoController extends AbstractController
             }
         }
 
-       
+        // Mensaje de éxito
         $mensaje = "¡Sorteo realizado! Se seleccionaron {$numeroGanadores} ganador(es).";
         if ($emailsEnviados > 0) {
             $mensaje .= " Se han enviado {$emailsEnviados} notificaciones.";
@@ -346,11 +326,10 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/{id}/restaurar', name: 'app_sorteo_restaurar', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
     public function restaurar(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
     {
         if ($this->isCsrfTokenValid('restaurar' . $sorteo->getId(), $request->request->get('_token'))) {
-           
+            // Restaurar el sorteo cambiando el estado a true
             $sorteo->setActivo(true);
             $em->flush();
             $this->addFlash('success', 'Sorteo restaurado correctamente.');
