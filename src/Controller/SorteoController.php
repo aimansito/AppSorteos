@@ -26,6 +26,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class SorteoController extends AbstractController
 {
     private const UPLOAD_DIR_PARAMETER = 'sorteo_images_directory';
+    private const CORREO = 'ahardao1001@g.educaand.es';
 
     public function __construct(private SluggerInterface $slugger) {}
 
@@ -260,7 +261,7 @@ class SorteoController extends AbstractController
         foreach ($ganadores as $ganador) {
             try {
                 $emailGanador = (new Email())
-                    ->from('ahardao1001@g.educaand.es')
+                    ->from(self::CORREO)
                     ->to($ganador->getEmail())
                     ->subject('¡Felicidades! Has ganado: ' . $sorteo->getNombreActividad())
                     ->html($this->renderView('emails/ganador.html.twig', [
@@ -289,7 +290,7 @@ class SorteoController extends AbstractController
             if (!$ganadoresSet->contains($p)) {
                 try {
                     $emailPerdedor = (new Email())
-                        ->from('ahardao1001@g.educaand.es')
+                        ->from(self::CORREO)
                         ->to($p->getEmail())
                         ->subject('Resultado del sorteo: ' . $sorteo->getNombreActividad())
                         ->html($this->renderView('emails/no_ganador.html.twig', [
