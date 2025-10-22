@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/participante')]
+#[IsGranted('ROLE_ADMIN')]
 final class ParticipanteController extends AbstractController
 {
     #[Route(name: 'app_participante_index', methods: ['GET'])]
