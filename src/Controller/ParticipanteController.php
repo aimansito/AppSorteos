@@ -87,7 +87,6 @@ final class ParticipanteController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Participante $participante, EntityManagerInterface $entityManager): Response
     {
-        // Identificar si la petición proviene del detalle del sorteo
         $sorteoId = $request->request->getInt('redirect_to_sorteo');
         $perteneceAlSorteo = $participante->getSorteo() && $participante->getSorteo()->getId() === $sorteoId;
 

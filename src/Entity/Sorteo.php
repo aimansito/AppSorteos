@@ -65,15 +65,15 @@ class Sorteo
             return;
         }
         
-        // Crear fecha actual en timezone de Madrid
+        
         $ahora = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Madrid'));
         
-        // Convertir la fecha del sorteo a DateTimeImmutable si es necesario
+       
         $fechaSorteo = $this->fecha instanceof \DateTimeImmutable 
             ? $this->fecha 
             : \DateTimeImmutable::createFromMutable($this->fecha);
         
-        // Comparar usando timestamps
+        
         if ($fechaSorteo->getTimestamp() < $ahora->getTimestamp()) {
             $context->buildViolation('La fecha y hora del sorteo deben ser iguales o posteriores al momento actual.')
                 ->atPath('fecha')

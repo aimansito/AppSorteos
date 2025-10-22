@@ -16,7 +16,6 @@ class MainController extends AbstractController
         $sorteosInactivos = [];
         $sorteosPendientes = [];
 
-        // Solo cargar sorteos inactivos y pendientes para administradores
         if ($this->isGranted('ROLE_ADMIN')) {
             $sorteosInactivos = $sorteoRepository->findInactivos();
             $sorteosPendientes = $sorteoRepository->findPendientes();
