@@ -51,6 +51,39 @@
             border-radius: 4px;
         }
 
+        .sorteo-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .sorteo-list li {
+            background: #f7f9fc;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #3f51b5;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .sorteo-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .meta-item {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.92em;
+            border: 1px solid transparent;
+        }
+
         .action-buttons {
             margin-top: 40px;
             border-top: 1px solid #ddd;
@@ -75,6 +108,9 @@
             <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="sorteo-imagen">
         {% endif %}
         <h1>Detalles del Sorteo</h1>
+        {% if sorteo.descripcion %}
+            <p>{{ sorteo.descripcion }}</p>
+        {% endif %}
         <hr>
 
         <div class="raffle-info mb-4">
@@ -87,70 +123,91 @@
                 <p><strong>Máx participantes:</strong> {{ sorteo.maxParticipantes }}</p>
             {% endif %}
             <p><strong>Número de ganadores:</strong> {{ sorteo.numeroGanadores }}</p>
+
         </div>
 
-        <h3 class="raffle-subtitle">Participantes ({{ participantes|length }})</h3>
-        
-        {% if participantes is empty %}
-            <p class="alert alert-info">No hay participantes aún.</p>
-        {% else %}
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Correo Electrónico</th>
-                            <th>Código</th>
-                            <th class="text-center">Ganador</th>
-                            <th class="text-center">Puesto</th>
-                            <th class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for participante in participantesOrdenados %}
+        {% if is_granted('ROLE_ADMIN') %}
+            <h3 class="raffle-subtitle">Participantes ({{ participantes|length }})</h3>
+            
+            {% if participantes is empty %}
+                <p class="alert alert-info">No hay participantes aún.</p>
+            {% else %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead class="table-light">
                             <tr>
-                                <td>{{ participante.nombre }}</td>
-                                <td><a href="mailto:{{ participante.email }}">{{ participante.email }}</a></td>
-                                <td><code class="text-muted">{{ participante.codigoEntrada }}</code></td>
-                                <td class="text-center">
-                                    {% if participante.esGanador %}
-                                        <span class="winner-tag">SÍ</span>
-                                    {% else %}
-                                        No
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    {% if participante.esGanador %}
-                                        {{ participante.puesto }}º
-                                    {% else %}
-                                        -
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">
-                                    <form method="post" action="{{ path('app_participante_delete', {'id': participante.id}) }}" onsubmit="return confirm('¿Seguro que quieres eliminar a este participante del sorteo?');" class="d-inline">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participante.id) }}">
-                                        <input type="hidden" name="redirect_to_sorteo" value="{{ sorteo.id }}">
-                                        <button class="btn btn-sm btn-outline-danger">Eliminar</button>
-                                    </form>
-                                </td>
+                                <th>Nombre</th>
+                                <th>Correo Electrónico</th>
+                                <th>Código</th>
+                                <th class="text-center">Ganador</th>
+                                <th class="text-center">Puesto</th>
+                                <th class="text-center">Acciones</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for participante in participantesOrdenados %}
+                                <tr>
+                                    <td>{{ participante.nombre }}</td>
+                                    <td><a href="mailto:{{ participante.email }}">{{ participante.email }}</a></td>
+                                    <td><code class="text-muted">{{ participante.codigoEntrada }}</code></td>
+                                    <td class="text-center">
+                                        {% if participante.esGanador %}
+                                            <span class="winner-tag">SÍ</span>
+                                        {% else %}
+                                            No
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if participante.esGanador %}
+                                            {{ participante.puesto }}º
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <form method="post" action="{{ path('app_participante_delete', {'id': participante.id}) }}" onsubmit="return confirm('¿Seguro que quieres eliminar a este participante del sorteo?');" class="d-inline">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participante.id) }}">
+                                            <input type="hidden" name="redirect_to_sorteo" value="{{ sorteo.id }}">
+                                            <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+            <div class="action-buttons">
+                {% if not yaSorteado %}
+                    <form method="POST" action="{{ path('app_sorteo_sortear', {'id': sorteo.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('sortear' ~ sorteo.id) }}">
+                        <button type="submit" class="btn btn-lg btn-sortear text-white">Sortear</button>
+                    </form>
+                {% endif %}
+                <a href="{{ path('app_main') }}" class="btn btn-secondary btn-lg">
+                    Volver al Listado
+                </a>
+            </div>
+        {% else %}
+            <ul class="sorteo-list">
+            {% for participante in participantesOrdenados %}
+                {% if participante.esGanador %}
+                <li>
+                    <h4>{{ participante.puesto ?? '1' }}º</h4>
+                    <div class="sorteo-meta">
+                        <span class="meta-item"><strong>Código de entrada:</strong> {{ participante.codigoEntrada }}</span>
+                        <br>
+                        <span class="meta-item"><strong>Iniciales:</strong> {{ participante.setIniciales }}</span>
+                    </div>
+                </li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+            <div class="action-buttons">
+                <a href="{{ path('app_main') }}" class="btn btn-secondary btn-lg">
+                    Volver al Listado
+                </a>
             </div>
         {% endif %}
-
-        <div class="action-buttons">
-            {% if not yaSorteado %}
-                <form method="POST" action="{{ path('app_sorteo_sortear', {'id': sorteo.id}) }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('sortear' ~ sorteo.id) }}">
-                    <button type="submit" class="btn btn-lg btn-sortear text-white">Sortear</button>
-                </form>
-            {% endif %}
-
-            <a href="{{ path('app_main') }}" class="btn btn-secondary btn-lg">
-                Volver al Listado
-            </a>
-        </div>
     </div>
 {% endblock %}

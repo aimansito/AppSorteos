@@ -111,4 +111,18 @@ class Participante
         $this->sorteo = $sorteo;
         return $this;
     }
+
+    public function setIniciales(): string {
+        $nombre = $this->getNombre();
+        $palabras = explode(' ', $nombre);
+        $iniciales = '';
+
+        foreach($palabras as $palabra) {
+            if(!empty($palabra)) {
+                $iniciales .= substr($palabra, 0, 1) . '.';
+            }
+        }
+
+        return strtoupper($iniciales);
+    }
 }
