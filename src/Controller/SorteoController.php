@@ -251,7 +251,7 @@ class SorteoController extends AbstractController
             $em->persist($historico);
         }
 
-        $em->flush();
+        $sorteo->setActivo(false);
 
         // Preparar ruta de imagen si existe
         $imagePath = null;
@@ -325,6 +325,8 @@ class SorteoController extends AbstractController
         if ($emailsFallidos > 0) {
             $mensaje .= " (Hubo {$emailsFallidos} emails que no se pudieron enviar)";
         }
+
+        $em->flush();
 
         $this->addFlash('success', $mensaje);
 
