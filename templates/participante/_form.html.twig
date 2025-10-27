@@ -18,6 +18,11 @@
         }) }}
         <div id="codigo-error" class="text-danger" style="display: none;"></div>
     </div>
+
+    {# Casilla de aceptación de términos (solo si el campo existe en el formulario) #}
+    {% if form.aceptarTerminos is defined %}
+        {{ form_row(form.aceptarTerminos) }}
+    {% endif %}
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {

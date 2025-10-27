@@ -179,6 +179,51 @@
         margin-top: 10px;
         text-align: center;
     }
+
+    /* Nueva estética para descripción y metadatos */
+    .sorteo-desc {
+        margin: 8px 0 12px;
+        padding: 8px 12px;
+        background-color: #fff8e6; /* suave amarillento */
+        border-left: 4px solid #ff9800;
+        color: #6d4c41;
+        border-radius: 6px;
+        font-size: 0.95em;
+        white-space: pre-line; /* soporta saltos de línea */
+    }
+
+    .sorteo-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .meta-item {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 0.92em;
+        border: 1px solid transparent;
+    }
+
+    .meta-date {
+        background-color: #e3f2fd; /* azul claro */
+        color: #0d47a1;
+        border-color: #90caf9;
+    }
+
+    .meta-place {
+        background-color: #e8f5e9; /* verde claro */
+        color: #1b5e20;
+        border-color: #a5d6a7;
+    }
+
+    .meta-participants {
+        background-color: #fff8e1; /* ámbar claro */
+        color: #6d4c41;
+        border-color: #ffe082;
+    }
 </style>
 
 <div class="example-wrapper">
@@ -212,15 +257,22 @@
     {% if sorteo.imagen is not empty %}
         <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="sorteo-imagen">
     {% endif %}
-    <h4>{{ sorteo.nombreActividad }}</h4><br>
-    <strong>Fecha: </strong>{{ sorteo.fecha|date('d/m/Y H:i') }}<br>
-    <strong>Lugar: </strong>{{ sorteo.lugar }}<br>
-    {% if sorteo.participantesIlimitados %}
-        <strong>Participantes: </strong>Ilimitados<br>
-    {% else %}
-        <strong>Máx participantes: </strong>{{ sorteo.maxParticipantes }}<br>
-        <strong>Plazas restantes: </strong>{{ sorteo.getPlazasRestantes() }}<br>
+    <h4>{{ sorteo.nombreActividad }}</h4>
+
+    {% if sorteo.descripcion %}
+        <div class="sorteo-desc">{{ sorteo.descripcion }}</div>
     {% endif %}
+
+    <div class="sorteo-meta">
+        <span class="meta-item meta-date"><strong>Fecha:</strong> {{ sorteo.fecha|date('d/m/Y H:i') }}</span>
+        <span class="meta-item meta-place"><strong>Lugar:</strong> {{ sorteo.lugar }}</span>
+        {% if sorteo.participantesIlimitados %}
+            <span class="meta-item meta-participants"><strong>Participantes:</strong> Ilimitados</span>
+        {% else %}
+            <span class="meta-item meta-participants"><strong>Máx participantes:</strong> {{ sorteo.maxParticipantes }}</span>
+            <span class="meta-item meta-participants"><strong>Plazas restantes:</strong> {{ sorteo.getPlazasRestantes() }}</span>
+        {% endif %}
+    </div>
 
     <div class="sorteo-actions">
         {% if sorteo.tienePlazasDisponibles() %}
@@ -260,14 +312,19 @@
                         {% if sorteo.imagen is not empty %}
                             <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="sorteo-imagen">
                         {% endif %}
-                        <h4>{{ sorteo.nombreActividad }}</h4><br>
-                        <strong>Fecha: </strong>{{ sorteo.fecha|date('d/m/Y H:i') }}<br>
-                        <strong>Lugar: </strong>{{ sorteo.lugar }}<br>
-                        {% if sorteo.participantesIlimitados %}
-                            <strong>Participantes: </strong>Ilimitados<br>
-                        {% else %}
-                            <strong>Máx participantes: </strong>{{ sorteo.maxParticipantes }}<br>
+                        <h4>{{ sorteo.nombreActividad }}</h4>
+                        {% if sorteo.descripcion %}
+                            <div class="sorteo-desc">{{ sorteo.descripcion }}</div>
                         {% endif %}
+                        <div class="sorteo-meta">
+                            <span class="meta-item meta-date"><strong>Fecha:</strong> {{ sorteo.fecha|date('d/m/Y H:i') }}</span>
+                            <span class="meta-item meta-place"><strong>Lugar:</strong> {{ sorteo.lugar }}</span>
+                            {% if sorteo.participantesIlimitados %}
+                                <span class="meta-item meta-participants"><strong>Participantes:</strong> Ilimitados</span>
+                            {% else %}
+                                <span class="meta-item meta-participants"><strong>Máx participantes:</strong> {{ sorteo.maxParticipantes }}</span>
+                            {% endif %}
+                        </div>
 
                         <div class="admin-buttons">
                             <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Sorteo</a>
@@ -296,14 +353,19 @@
                         {% if sorteo.imagen is not empty %}
                             <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="sorteo-imagen">
                         {% endif %}
-                        <h4>{{ sorteo.nombreActividad }}</h4><br>
-                        <strong>Fecha: </strong>{{ sorteo.fecha|date('d/m/Y H:i') }}<br>
-                        <strong>Lugar: </strong>{{ sorteo.lugar }}<br>
-                        {% if sorteo.participantesIlimitados %}
-                            <strong>Participantes: </strong>Ilimitados<br>
-                        {% else %}
-                            <strong>Máx participantes: </strong>{{ sorteo.maxParticipantes }}<br>
+                        <h4>{{ sorteo.nombreActividad }}</h4>
+                        {% if sorteo.descripcion %}
+                            <div class="sorteo-desc">{{ sorteo.descripcion }}</div>
                         {% endif %}
+                        <div class="sorteo-meta">
+                            <span class="meta-item meta-date"><strong>Fecha:</strong> {{ sorteo.fecha|date('d/m/Y H:i') }}</span>
+                            <span class="meta-item meta-place"><strong>Lugar:</strong> {{ sorteo.lugar }}</span>
+                            {% if sorteo.participantesIlimitados %}
+                                <span class="meta-item meta-participants"><strong>Participantes:</strong> Ilimitados</span>
+                            {% else %}
+                                <span class="meta-item meta-participants"><strong>Máx participantes:</strong> {{ sorteo.maxParticipantes }}</span>
+                            {% endif %}
+                        </div>
                         
                         <div class="admin-buttons">
                             <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Sorteo</a>

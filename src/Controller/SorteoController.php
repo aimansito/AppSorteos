@@ -97,9 +97,13 @@ class SorteoController extends AbstractController
     #[Route('/{id}', name: 'app_sorteo_show', methods: ['GET'])]
     public function show(Sorteo $sorteo): Response
     {
+        // Determinar si ya existe algún ganador para ocultar el botón de sorteo en la vista
+        $yaSorteado = $sorteo->getParticipantes()->exists(fn($i, $p) => $p->isEsGanador());
+
         return $this->render('sorteo/show.html.twig', [
             'sorteo' => $sorteo,
             'participantes' => $sorteo->getParticipantes(),
+            'yaSorteado' => $yaSorteado,
         ]);
     }
 
@@ -151,7 +155,8 @@ class SorteoController extends AbstractController
     public function apuntarse(Sorteo $sorteo, EntityManagerInterface $em, Request $request): Response
     {
         $participante = new Participante();
-        $form = $this->createForm(\App\Form\ParticipanteType::class, $participante);
+        // Usar el formulario público que requiere aceptar términos
+        $form = $this->createForm(\App\Form\ParticipantePublicType::class, $participante);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

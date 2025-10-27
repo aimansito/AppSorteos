@@ -42,6 +42,9 @@ class Sorteo
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $imagen = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $descripcion = null;
+
     #[ORM\Column]
     private bool $activo = true;
 
@@ -138,6 +141,17 @@ class Sorteo
     public function setImagen(?string $imagen): static
     {
         $this->imagen = $imagen;
+        return $this;
+    }
+
+    public function getDescripcion(): ?string
+    {
+        return $this->descripcion;
+    }
+
+    public function setDescripcion(?string $descripcion): static
+    {
+        $this->descripcion = $descripcion;
         return $this;
     }
     

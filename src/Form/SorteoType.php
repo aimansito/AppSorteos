@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Sorteo;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,6 +28,13 @@ class SorteoType extends AbstractType
                 'html5' => true,
             ])
             ->add('lugar')
+            ->add('descripcion', TextareaType::class, [
+                'label' => 'Descripción',
+                'required' => false,
+                'attr' => [
+                    'rows' => 4,
+                ],
+            ])
             ->add('participantesIlimitados', CheckboxType::class, [
                 'label' => 'Participantes Ilimitados',
                 'required' => false,

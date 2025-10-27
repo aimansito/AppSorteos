@@ -8,6 +8,16 @@
 </div>
 
 <div class="mb-3">
+    {# descripcion #}
+    {{ form_row(form.descripcion, {
+        'attr': {
+            'class': 'form-control form-control-lg form-control-yellow',
+            'rows': 4
+        }
+    }) }}
+</div>
+
+<div class="mb-3">
     {# fecha #}
     {{ form_row(form.fecha, {
         'attr': {'class': 'form-control form-control-lg form-control-yellow'}

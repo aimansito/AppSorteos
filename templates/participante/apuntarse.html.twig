@@ -69,6 +69,26 @@
             padding-top: 2px;
             font-size: 1.1rem;
         }
+
+        /* Caja destacada para aceptar términos */
+        .terms-box {
+            background-color: #fff8e1; /* amarillo suave */
+            border: 1px dashed #f4b400;
+            padding: 12px 14px;
+            border-radius: 8px;
+            text-align: center;            /* Centra el texto */
+            display: flex;                 /* Controla input + label */
+            align-items: center;
+            justify-content: center;       /* Centra el conjunto (checkbox + texto) */
+            gap: 8px;
+            flex-wrap: wrap;               /* Evita desbordes en pantallas pequeñas */
+        }
+        .terms-box .form-check-input { order: 0; }
+        .terms-box .form-check-label { order: 1; }
+        .terms-box .form-check-label a {
+            color: #0d6efd; /* enlace azul */
+            text-decoration: underline;
+        }
     </style>
 {% endblock %}
 
