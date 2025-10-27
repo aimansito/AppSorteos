@@ -66,6 +66,9 @@
 {% endblock %}
 
 {% block body %}
+    {% set participantesOrdenados = participantes|sort((a, b) => 
+        (b.esGanador <=> a.esGanador) ?: (a.puesto <=> b.puesto)
+    ) %}
     <div class="raffle-detail-container">
 
         {% if sorteo.imagen is not empty %}
@@ -104,7 +107,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for participante in participantes %}
+                        {% for participante in participantesOrdenados %}
                             <tr>
                                 <td>{{ participante.nombre }}</td>
                                 <td><a href="mailto:{{ participante.email }}">{{ participante.email }}</a></td>
