@@ -39,6 +39,17 @@ class SorteoController extends AbstractController
         ]);
     }
 
+    // Metodo que muestra todos los sorteos que ya han pasado
+    #[Route('/listado/pasados', name: 'app_sorteo_mostrar_pasados')]
+    public function mostrarPasados(SorteoRepository $sorteoRepository) {
+        $sorteosPasados = $sorteoRepository->findInactivos();
+
+        return $this->render('sorteo/pasados.html.twig', [
+            'sorteos' => $sorteosPasados,
+            'titulo' => 'Sorteos pasados y finalizados'
+        ]);
+    }
+
     #[Route('/new', name: 'app_sorteo_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): Response
