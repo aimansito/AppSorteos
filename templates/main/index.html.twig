@@ -351,15 +351,7 @@
 
 {% endfor %}
 </ul>
-    {% if not is_granted('ROLE_ADMIN') %}
 
-<div class="admin-buttons">
-    <a href="{{ path('app_sorteo_mostrar_pasados') }}" class="btn btn-info btn-lg">
-        Sorteos Pasados 🕒
-    </a>
-</div>
-
-    {% endif %}
 
     {% endif %}
 
