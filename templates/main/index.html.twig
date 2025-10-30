@@ -223,11 +223,53 @@
         color: #6d4c41;
         border-color: #ffe082;
     }
+    
+    .contenedor {
+        margin-bottom: 10px;
+    }
+
+    .admin-buttons {
+        display: flex;
+        justify-content: center;
+        border-bottom: 2px solid #e9ecef;
+        padding: 0 10px;
+        margin: 0 auto;
+        max-width: fit-content;
+    }
+
+    .admin-buttons .menu {
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        margin-bottom: -2px;
+        
+        font-weight: 500;
+        font-size: 16px;
+        color: #495057;
+        
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .admin-buttons .menu:hover {
+        color: #007bff;
+        border-bottom-color: #adb5bd;
+    }
+
+    .admin-buttons .menu.active {
+        font-weight: 600;
+        color: #343a40;
+        border-bottom-color: #ff9800;
+    }
 </style>
 
 <div class="example-wrapper">
-    <h1>Sorteos Disponibles</h1>
-
+    <h1>CrossOver</h1>
     {% if app.user %}
         <div class="user-controls">
             <h2>Hola {{ app.user.username }}!</h2>
@@ -243,6 +285,21 @@
             
         </div>
     {% endif %}
+    <div class="contenedor">
+        <div class="admin-buttons">
+            <a href="{{ path('app_main') }}" class="menu active">
+                🔍Sorteos Disponibles
+            </a>
+            <a href="{{ path('app_sorteo_mostrar_pasados') }}" class="menu">
+                🏆Sorteos Realizados
+            </a>
+        {% if app.user %}
+            <a href="{{ path('app_sorteo_mostrar_pasados') }}" class="menu">
+                ⌚Sorteos Pendientes
+            </a>
+        {% endif %}
+        </div>
+    </div>
 
     {% set ahora = "now"|date("Y-m-d H:i:s") %}
     {% set sorteosActivos = sorteos|filter(s => s.fecha > ahora) %}
@@ -306,6 +363,7 @@
 
     {% endif %}
 
+{#
     {% if is_granted('ROLE_ADMIN') and sorteosPendientes is not empty %}
         <div style="margin-top: 40px;">
             <details>
@@ -420,5 +478,6 @@
             </details>
         </div>
     {% endif %}
+#}
 </div>
 {% endblock %}

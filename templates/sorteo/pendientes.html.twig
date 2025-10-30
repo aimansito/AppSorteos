@@ -290,11 +290,11 @@
             <a href="{{ path('app_main') }}" class="menu">
                 🔍Sorteos Disponibles
             </a>
-            <a href="{{ path('app_sorteo_mostrar_pasados') }}" class="menu active">
+            <a href="{{ path('app_sorteo_mostrar_pasados') }}" class="menu">
                 🏆Sorteos Realizados
             </a>
         {% if app.user %}
-            <a href="{{ path('app_sorteo_mostrar_pendientes') }}" class="menu">
+            <a href="{{ path('app_sorteo_mostrar_pendientes') }}" class="menu active">
                 ⌚Sorteos Pendientes
             </a>
         {% endif %}
@@ -302,7 +302,7 @@
     </div>
 
     {% if sorteos is empty %}
-        <p>No hay sorteos disponibles por ahora.</p>
+        <p>No hay sorteos pendientes por ahora.</p>
     {% else %}
        <ul class="sorteo-list">
 {% for sorteo in sorteos %}

@@ -50,6 +50,16 @@ class SorteoController extends AbstractController
         ]);
     }
 
+    #[Route('/listado/pendientes', name: 'app_sorteo_mostrar_pendientes')]
+    public function mostrarNoRealizados(SorteoRepository $sorteoRepository) {
+        $sorteosNoRealizados = $sorteoRepository->findPendientes();
+
+        return $this->render('sorteo/pendientes.html.twig', [
+            'sorteos' => $sorteosNoRealizados,
+            'titulo' => 'Sorteos pendientes'
+        ]);
+    }
+
     #[Route('/new', name: 'app_sorteo_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request, EntityManagerInterface $em, ValidatorInterface $validator): Response

@@ -35,6 +35,7 @@ class SorteoRepository extends ServiceEntityRepository
             ->where('s.activo = :activo')
             ->setParameter('activo', false)
             ->orderBy('s.fecha', 'DESC')
+            ->setMaxResults(10)
             ->getQuery()
             ->getResult();
     }
