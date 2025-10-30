@@ -27,4 +27,10 @@ class MainController extends AbstractController
             'sorteosPendientes' => $sorteosPendientes,
         ]);
     }
+
+    #[Route('/terminos', name: 'app_terminos')]
+    public function terminos(): Response
+    {
+        return $this->render('static/terminos.html.twig');
+    }
 }
