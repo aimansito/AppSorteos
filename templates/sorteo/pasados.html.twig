@@ -107,10 +107,11 @@
 
     .sorteo-imagen {
         width: 100%;
-        max-height: 180px;
-        object-fit: cover;
+        aspect-ratio: 16 / 9;
+        object-fit: contain;
         border-radius: 6px;
         margin-bottom: 10px;
+        background-color: #f3f4f6;
     }
 
     .sorteo-list h4 {
@@ -187,6 +188,17 @@
         font-weight: 600;
         color: #343a40;
         border-bottom-color: #ff9800;
+    }
+
+    @media (max-width: 768px) {
+        .example-wrapper { padding: 20px; }
+        .admin-buttons { flex-wrap: wrap; }
+    }
+
+    @media (max-width: 480px) {
+        h1 { font-size: 1.6em; }
+        .btn { width: 100%; max-width: 260px; }
+        .sorteo-actions { gap: 10px; }
     }
 </style>
 

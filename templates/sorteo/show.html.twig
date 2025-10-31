@@ -128,13 +128,6 @@
             color: #3f51b5;
         }
 
-        .img-fluid {
-            max-width: 200px;
-            height: auto;
-            display:flex;
-            margin: 0 auto;
-        }
-
         @media (max-width: 768px) {
             .raffle-detail-container {
                 padding: 25px 20px;
@@ -150,6 +143,61 @@
                 padding: 14px;
                 font-size: 1rem;
             }
+
+            /* Versión móvil: tarjetas de participantes */
+            .participants-mobile .participant-card {
+                border: 1px solid #e9ecef;
+                border-radius: 10px;
+                background-color: #ffffff;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+                padding: 12px 14px;
+                margin-bottom: 12px;
+            }
+            .participants-mobile .pc-row {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: flex-start;
+                gap: 4px;
+                padding: 6px 0;
+                border-bottom: 1px dashed #f1f3f5;
+            }
+            .participants-mobile .pc-row:last-child {
+                border-bottom: none;
+            }
+            .participants-mobile .pc-label {
+                font-weight: 700;
+                color: #3f51b5;
+                font-size: 0.88rem;
+                text-transform: uppercase;
+                letter-spacing: 0.02em;
+                margin-right: 0;
+                margin-bottom: 4px;
+            }
+            .participants-mobile .pc-value {
+                color: #212529;
+                text-align: left;
+                flex: 1 1 0;
+                min-width: 0;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+                font-size: 1.02rem;
+                font-weight: 600;
+                line-height: 1.35;
+            }
+            .participants-mobile .pc-value a {
+                display: inline-block;
+                max-width: 100%;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+                color: inherit;
+            }
+            .participants-mobile .pc-actions {
+                margin-top: 10px;
+            }
+            .participants-mobile .winner-tag {
+                margin-left: 8px;
+            }
         }
     </style>
 {% endblock %}
@@ -161,7 +209,7 @@
     <div class="raffle-detail-container">
 
         {% if sorteo.imagen is not empty %}
-            <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="img-fluid rounded mb-4">
+            <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="sorteo-imagen img-fluid rounded mb-4">
         {% endif %}
 
         <h1>{{ sorteo.nombreActividad }}</h1>
@@ -189,7 +237,7 @@
             {% if participantes is empty %}
                 <p class="alert alert-info">No hay participantes aún.</p>
             {% else %}
-                <div class="table-responsive">
+                <div class="table-responsive d-none d-md-block">
                     <table class="table table-striped table-hover align-middle">
                         <thead class="table-light">
                             <tr>
@@ -233,6 +281,53 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Versión móvil: listado de tarjetas -->
+                <div class="participants-mobile d-block d-md-none">
+                    {% for participante in participantesOrdenados %}
+                        <div class="participant-card">
+                            <div class="pc-row">
+                                <span class="pc-label">Nombre</span>
+                                <span class="pc-value">{{ participante.nombre }}</span>
+                            </div>
+                            <div class="pc-row">
+                                <span class="pc-label">Correo Electrónico</span>
+                                <span class="pc-value"><a href="mailto:{{ participante.email }}">{{ participante.email }}</a></span>
+                            </div>
+                            <div class="pc-row">
+                                <span class="pc-label">Código</span>
+                                <span class="pc-value"><code class="text-muted">{{ participante.codigoEntrada }}</code></span>
+                            </div>
+                            <div class="pc-row">
+                                <span class="pc-label">Ganador</span>
+                                <span class="pc-value">
+                                    {% if participante.esGanador %}
+                                        SÍ <span class="winner-tag">Ganador</span>
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="pc-row">
+                                <span class="pc-label">Puesto</span>
+                                <span class="pc-value">
+                                    {% if participante.esGanador %}
+                                        {{ participante.puesto }}º
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="pc-actions">
+                                <form method="post" action="{{ path('app_participante_delete', {'id': participante.id}) }}" onsubmit="return confirm('¿Seguro que quieres eliminar a este participante del sorteo?');" class="d-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participante.id) }}">
+                                    <input type="hidden" name="redirect_to_sorteo" value="{{ sorteo.id }}">
+                                    <button class="btn btn-outline-danger btn-sm w-100">Eliminar</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
 
             <div class="action-buttons">
@@ -242,6 +337,7 @@
                         <button type="submit" class="btn btn-sortear btn-lg">🎲 Sortear</button>
                     </form>
                 {% endif %}
+                <a href="{{ path('app_sorteo_edit', {'id': sorteo.id}) }}" class="btn btn-warning btn-lg">Editar Sorteo</a>
                 <a href="{{ path('app_main') }}" class="btn btn-secondary btn-lg">
                     Volver al Listado
                 </a>
@@ -249,20 +345,20 @@
 
         {% else %}
             <h3 class="raffle-subtitle">Ganadores</h3>
-            {% if participantesOrdenados|filter(p => p.esGanador)|length == 0 %}
+            {% if not yaSorteado %}
                 <p class="alert alert-warning">Aún no hay ganadores definidos.</p>
             {% else %}
                 <ul class="sorteo-list">
                     {% for participante in participantesOrdenados %}
-                        {%if participante.esGanador %} 
-                        <li>
-                            <h4>{{ participante.puesto ?? '1' }}º Puesto</h4>
-                            <div class="sorteo-meta">
-                                <span class="meta-item"><strong>Código de entrada:</strong> {{ participante.codigoEntrada }}</span>
-                                <span class="meta-item"><strong>Iniciales:</strong> {{ participante.setIniciales }}</span>
-                            </div>
-                        </li>
-                        {%endif%}
+                        {% if participante.esGanador %}
+                            <li>
+                                <h4>{{ participante.puesto ?? '1' }}º Puesto</h4>
+                                <div class="sorteo-meta">
+                                    <span class="meta-item"><strong>Código de entrada:</strong> {{ participante.codigoEntrada }}</span>
+                                    <span class="meta-item"><strong>Iniciales:</strong> {{ participante.setIniciales }}</span>
+                                </div>
+                            </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             {% endif %}

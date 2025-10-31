@@ -90,11 +90,32 @@
         }
     }
 
+    @media (max-width: 768px) {
+        .example-wrapper { padding: 20px; }
+        .sorteo-list { grid-template-columns: 1fr; gap: 12px; }
+    }
+
     @media (max-width: 600px) {
         .sorteo-list {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr;
             gap: 12px;
         }
+        h1 { font-size: 1.8em; }
+    }
+
+    @media (max-width: 480px) {
+        .sorteo-list {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        h1 { font-size: 1.6em; }
+        .btn { width: 100%; max-width: 260px; }
+        .sorteo-actions { gap: 10px; flex-direction: column; align-items: stretch; }
+        .sorteo-actions .btn { width: 100%; max-width: none; }
+        .admin-buttons { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+        .admin-buttons .btn { width: 100%; max-width: none; }
+        .admin-buttons form { width: 100%; }
+        .admin-buttons form .btn { width: 100%; }
     }
 
     .sorteo-list li {
@@ -117,10 +138,11 @@
 
     .sorteo-imagen {
         width: 100%;
-        max-height: 160px;
-        object-fit: cover;
+        aspect-ratio: 16 / 9;
+        object-fit: contain;
         border-radius: 8px;
         margin-bottom: 10px;
+        background-color: #f3f4f6;
     }
 
     h4 {
@@ -226,7 +248,7 @@
             <a href="{{ path('app_main') }}" class="menu active">🔍 Sorteos Disponibles</a>
             <a href="{{ path('app_sorteo_mostrar_pasados') }}" class="menu">🏆 Sorteos Realizados</a>
             {% if app.user %}
-                <a href="{{ path('app_sorteo_mostrar_pasados') }}" class="menu">⌚ Sorteos Pendientes</a>
+                <a href="{{ path('app_sorteo_mostrar_pendientes') }}" class="menu">⌚ Sorteos Pendientes</a>
             {% endif %}
         </div>
     </div>
@@ -267,12 +289,13 @@
                         {% else %}
                             <h3 style="color: red;">Completo</h3>
                         {% endif %}
-                        <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver sorteo</a>
+                        <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Sorteo</a>
                     </div>
 
                     {% if is_granted('ROLE_ADMIN') %}
-                        <div class="admin-buttons">
-                            <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" onsubmit="return confirm('¿Seguro que quieres ocultar este sorteo?');">
+                        <div class="admin-buttons" style="gap: 8px; display: flex; align-items: center;">
+                            <a href="{{ path('app_sorteo_edit', {'id': sorteo.id}) }}" class="btn btn-warning">Editar Sorteo</a>
+                            <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" onsubmit="return confirm('¿Seguro que quieres ocultar este sorteo y moverlo a pendientes?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sorteo.id) }}">
                                 <button class="btn btn-danger">Ocultar</button>
                             </form>

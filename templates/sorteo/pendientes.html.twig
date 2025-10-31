@@ -175,6 +175,15 @@
         text-align: center;
     }
 
+    .sorteo-imagen {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        object-fit: contain;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        background-color: #f3f4f6;
+    }
+
     .admin-buttons {
         margin-top: 10px;
         text-align: center;
@@ -266,6 +275,20 @@
         color: #343a40;
         border-bottom-color: #ff9800;
     }
+
+    @media (max-width: 768px) {
+        .example-wrapper { padding: 20px; }
+        .admin-buttons { flex-wrap: wrap; }
+        .herramientas { margin-left: 0; justify-content: center; }
+    }
+
+    @media (max-width: 480px) {
+        h1 { font-size: 1.6em; }
+        .btn { width: 100%; max-width: 260px; }
+        .sorteo-actions { gap: 10px; display: flex; flex-direction: column; align-items: stretch; }
+        .sorteo-actions .btn { width: 100%; max-width: none; }
+        .sorteo-actions form { display: block !important; margin-left: 0 !important; width: 100%; }
+    }
 </style>
 
 <div class="example-wrapper">
@@ -329,7 +352,13 @@
 
     <div class="sorteo-actions">
         <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Sorteo</a>
-        
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_sorteo_edit', {'id': sorteo.id}) }}" class="btn btn-warning">Editar Sorteo</a>
+            <form method="post" action="{{ path('app_sorteo_restaurar', {'id': sorteo.id}) }}" onsubmit="return confirm('¿Restaurar este sorteo a disponibles?');" style="display:inline-block;margin-left:8px;">
+                <input type="hidden" name="_token" value="{{ csrf_token('restaurar' ~ sorteo.id) }}">
+                <button class="btn btn-success">Restaurar</button>
+            </form>
+        {% endif %}
     </div>
     </li>
 {% endfor %}

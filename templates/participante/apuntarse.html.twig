@@ -89,6 +89,18 @@
             color: #0d6efd; /* enlace azul */
             text-decoration: underline;
         }
+
+        @media (max-width: 768px) {
+            .full-width-form-container { margin: 24px auto; padding: 16px; }
+            .full-width-form-container h1 { font-size: 1.6rem; }
+        }
+
+        @media (max-width: 480px) {
+            .btn { width: 100%; max-width: 280px; }
+            .form-check-label { font-size: 1rem; }
+            .form-check-input { width: 1.3em; height: 1.3em; }
+            .terms-box { gap: 6px; }
+        }
     </style>
 {% endblock %}
 

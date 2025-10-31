@@ -52,11 +52,12 @@ class SorteoController extends AbstractController
 
     #[Route('/listado/pendientes', name: 'app_sorteo_mostrar_pendientes')]
     public function mostrarNoRealizados(SorteoRepository $sorteoRepository) {
-        $sorteosNoRealizados = $sorteoRepository->findPendientes();
+        // Mostrar los sorteos ocultos (inactivos) para permitir restaurarlos
+        $sorteosOcultos = $sorteoRepository->findInactivos();
 
         return $this->render('sorteo/pendientes.html.twig', [
-            'sorteos' => $sorteosNoRealizados,
-            'titulo' => 'Sorteos pendientes'
+            'sorteos' => $sorteosOcultos,
+            'titulo' => 'Sorteos pendientes (ocultos)'
         ]);
     }
 
@@ -172,8 +173,8 @@ class SorteoController extends AbstractController
             $em->flush();
             $this->addFlash('success', 'Sorteo ocultado correctamente.');
         }
-
-        return $this->redirectToRoute('app_main');
+        // Tras ocultar, ir al listado de Sorteos Pendientes (ocultos)
+        return $this->redirectToRoute('app_sorteo_mostrar_pendientes');
     }
 
     #[Route('/{id}/apuntarse', name: 'app_sorteo_apuntarse', methods: ['GET', 'POST'])]
@@ -360,6 +361,7 @@ class SorteoController extends AbstractController
     }
 
     #[Route('/{id}/restaurar', name: 'app_sorteo_restaurar', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function restaurar(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
     {
         if ($this->isCsrfTokenValid('restaurar' . $sorteo->getId(), $request->request->get('_token'))) {
