@@ -22,6 +22,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Controlador de Sorteos.
@@ -34,9 +35,9 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class SorteoController extends AbstractController
 {
     private const UPLOAD_DIR_PARAMETER = 'sorteo_images_directory';
-    private const CORREO = 'ahardao1001@g.educaand.es';
+    private const CORREO = 'correo@correo.com';
 
-    public function __construct(private SluggerInterface $slugger) {}
+    public function __construct(private SluggerInterface $slugger, private HttpClientInterface $httpClientInterface) {}
 
     #[Route(name: 'app_sorteo_index', methods: ['GET'])]
     public function index(SorteoRepository $sorteoRepository): Response
@@ -207,6 +208,32 @@ class SorteoController extends AbstractController
                 return $this->redirectToRoute('app_main');
             }
 
+            /*
+            * Verificación del código de entrada con la url https://entradasytickets.com/check_ticket/{codigo}
+
+            $codigoEntrada = $participante->getCodigoEntrada();
+            $ticketValido = false;
+
+            if($codigoEntrada) {
+                $urlValidacion = sprintf('https://entradasytickets.com/check_ticket/%s', $codigoEntrada);
+
+                try {
+                    $response = $this->httpClientInterface->request('GET', $urlValidacion);
+
+                    $contenido = $response->getContent();
+                    $ticketValido = filter_var($contenido, FILTER_VALIDATE_BOOL);
+                } catch(Exception $e) {
+                    $this->addFlash('error', 'No se pudo verificar la validez del código de entrada. Inténtalo de nuevo');
+                    return $this->redirectToRoute('app_sorteo_apuntarse', ['id' => $sorteo->getId()]);
+                }
+
+                if(!$ticketValido) {
+                    $this->addFlash('warning', 'El código de entrada proporcionado no es válido');
+                    return $this->redirectToRoute('app_sorteo_apuntarse', ['id' => $sorteo->getId()]);
+                }
+            }
+            */
+
             // Verificar si ya existe un participante con el mismo código en este sorteo
             $existeCodigo = $em->getRepository(Participante::class)->codigoExisteEnSorteo(
                 $participante->getCodigoEntrada(),
@@ -237,7 +264,7 @@ class SorteoController extends AbstractController
         ]);
     }
 
-   #[Route('/{id}/sortear', name: 'app_sorteo_sortear', methods: ['POST'])]
+    #[Route('/{id}/sortear', name: 'app_sorteo_sortear', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function sortear(Request $request, Sorteo $sorteo, EntityManagerInterface $em, MailerInterface $mailer): Response
     {

@@ -60,7 +60,7 @@ Para poder desplegar de forma correcta la aplicación para su correcto funcionam
 
 #### Archivos a editar
 
-`.env`
+**`.env`**
 
 Asegurate de configurar correctamente los siguientes parámetros de entorno:
 1. `MAILER_DSN` --> Para el envio de correos electrónicos. **Ejemplo con Gmail**:
@@ -72,13 +72,24 @@ MAILER_DSN=gmail://USER:PASS@localhost
 DATABASE_URL="mysql://root:Contraseña@127.0.0.1:3306/sorteo?serverVersion=8.0&charset=utf8mb4"
 ```
 
-`src/Controller/SorteoController.php`
+**IMPORTANTE**
+
+Para obtener las credenciales y la configuración que necesitas para un DSN (como `gmail://USUARIO:CONTRASEÑA@default` o `smtp://...`), los pasos más relevantes son:
+
+   1. Verificación en dos pasos: Necesitas tener la Verificación en 2 pasos activada en tu cuenta de Google.
+   2. Contraseña de Aplicación: En lugar de tu contraseña habitual de Gmail, necesitarás generar una Contraseña de Aplicación específica, ya que Gmail no permite el uso de la contraseña principal para inicios de sesión mediante SMTP por seguridad.
+
+**`src/Controller/SorteoController.php`**
 
 En este controlador, debes establecer la constante para el correo remitente, el cual se utilizará para el envío de notificaciones.
 
 ```php
 private const CORREO = 'correo@correo.com'; // <- Reemplazar por el correo real
 ```
+
+Otra parte a tener en cuenta es la verificación del código de entrada. Actualmente está comentada esa función en el `SorteoController` debido a que para las pruebas siempre da falso a la hora de ingresar un código ya que no sabemos como funciona la url [entradasytickets.com](https://entradasytickets.com/check_tiket/{codigoEntrada}) que es con la que se nos informó que realicemos la comprobación.
+
+Dicha función se encuentra desde la línea **211** hasta la línea **235** de dicho archivo por si en algun momento se quisiera implementar esa lógica. 
 
 Una vez realizados estos cambios procederemos a ejecutar el siguiente comando en la consola de Symfony en el caso de que no tengamos creada la base de datos:
 
