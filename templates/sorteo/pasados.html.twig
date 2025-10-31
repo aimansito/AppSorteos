@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Sorteos CrossOver{% endblock %}
+{% block title %}Sorteos Realizados - CrossOver{% endblock %}
 
 {% block body %}
 <style>
     .example-wrapper {
         margin: 2em auto;
-        max-width: 900px;
-        width: 90%;
+        max-width: 1200px;
+        width: 95%;
         font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
         color: #333;
         background: white;
@@ -23,29 +23,31 @@
         margin-bottom: 25px;
         font-size: 2.2em;
         font-weight: 500;
+        text-align: center;
     }
 
-    h3 {
-        color: #333;
-        font-weight: 400;
-        margin-bottom: 15px;
-    }
-    
     .user-controls {
         margin-bottom: 25px;
         padding: 15px;
         background-color: #e8eaf6;
         border-radius: 8px;
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
         align-items: center;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .herramientas {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 10px;
     }
 
-    .btn, .logout-button, .login-button, .user-controls a {
+    .btn {
         display: inline-block;
         padding: 8px 16px;
-        margin-right: 5px;
         border-radius: 6px;
         text-decoration: none;
         font-weight: 500;
@@ -54,52 +56,37 @@
         border: none;
         text-align: center;
         line-height: 1.5;
+        white-space: nowrap;
     }
 
-    .btn:hover, .logout-button:hover, .login-button:hover, .user-controls a:hover {
+    .btn:hover {
         transform: translateY(-1px);
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
+    .btn-primary { background-color: #3f51b5; color: white; }
+    .btn-primary:hover { background-color: #303f9f; }
 
-    .btn-success {
-        background-color: #4CAF50;
-        color: white;
-    }
-
-    .btn-success:hover {
-        background-color: #43A047;
-    }
-
-    .btn-danger {
-        background-color: #4a4a4a;
-        color: white;
-    }
-
-    .btn-danger:hover {
-        background-color: #1e1e1e;
-    }
-
-    .btn-info {
-        background-color: #2196F3;
-        color: white;
-    }
-
-    .btn-info:hover {
-        background-color: #1E88E5;
-    }
+    .btn-info { background-color: #2196F3; color: white; }
+    .btn-info:hover { background-color: #1E88E5; }
 
     .sorteo-list {
         list-style: none;
         padding: 0;
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 20px;
     }
-    
-    @media (max-width: 768px) {
+
+    @media (max-width: 1024px) {
         .sorteo-list {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 600px) {
+        .sorteo-list {
+            grid-template-columns: repeat(1, 1fr);
         }
     }
 
@@ -110,7 +97,7 @@
         border-left: 5px solid #3f51b5;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         transition: transform 0.2s;
-        position: relative;
+        text-align: center;
     }
 
     .sorteo-list li:hover {
@@ -118,66 +105,19 @@
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
     }
 
-   .sorteo-list strong {
-        font-size: 1.1em;
-        display: inline-block;
-        margin-right: 5px;
+    .sorteo-imagen {
+        width: 100%;
+        max-height: 180px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-bottom: 10px;
+    }
+
+    .sorteo-list h4 {
+        font-size: 1.2em;
         color: #3f51b5;
-        font-weight: 500;
-    }
-
-    
-    .plazas-restantes {
+        margin: 8px 0;
         font-weight: 600;
-        color: #ff9800;
-    }
-    
-    .sorteo-list li h3 {
-        color: #F44336 !important;
-        font-weight: 600;
-        display: inline-block;
-        padding: 5px 10px;
-        border: 2px solid #F44336;
-        border-radius: 5px;
-        margin: 0;
-    }
-
-    .example-wrapper p {
-        padding: 15px;
-        background-color: #fff3e0;
-        border: 1px solid #ffe0b2;
-        border-radius: 8px;
-        color: #e65100;
-        font-weight: 500;
-    }
-    
-    .sorteo-actions { 
-        margin-top: 15px; 
-    }
-    
-    .sorteo-actions form {
-        display: inline;
-    }
-    h1{
-        font-size: 2.2em;
-        font-weight: 500;
-        text-align: center;
-    }
-
-    .herramientas{
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-left: 15%;
-    }
-    .sorteo-actions { 
-        margin-top: 15px; 
-        text-align: center;
-    }
-
-    .admin-buttons {
-        margin-top: 10px;
-        text-align: center;
     }
 
     .sorteo-desc {
@@ -193,39 +133,30 @@
 
     .sorteo-meta {
         display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
+        flex-direction: column;
+        gap: 6px;
         margin-bottom: 10px;
+        font-size: 0.9em;
+        align-items: center;
     }
 
     .meta-item {
-        display: inline-block;
         padding: 6px 10px;
         border-radius: 6px;
-        font-size: 0.92em;
         border: 1px solid transparent;
     }
 
-    .meta-date {
-        background-color: #e3f2fd;
-        color: #0d47a1;
-        border-color: #90caf9;
-    }
+    .meta-date { background-color: #e3f2fd; color: #0d47a1; border-color: #90caf9; }
+    .meta-place { background-color: #e8f5e9; color: #1b5e20; border-color: #a5d6a7; }
+    .meta-participants { background-color: #fff8e1; color: #6d4c41; border-color: #ffe082; }
 
-    .meta-place {
-        background-color: #e8f5e9;
-        color: #1b5e20;
-        border-color: #a5d6a7;
-    }
-
-    .meta-participants {
-        background-color: #fff8e1;
-        color: #6d4c41;
-        border-color: #ffe082;
+    .sorteo-actions {
+        margin-top: 10px;
+        text-align: center;
     }
 
     .contenedor {
-        margin-bottom: 10px;
+        margin-bottom: 20px;
     }
 
     .admin-buttons {
@@ -239,19 +170,10 @@
 
     .admin-buttons .menu {
         text-decoration: none;
-        display: flex;
-        align-items: center;
         padding: 12px 20px;
-        margin-bottom: -2px;
-        
         font-weight: 500;
         font-size: 16px;
         color: #495057;
-        
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-        
         border-bottom: 2px solid transparent;
         transition: all 0.3s ease;
     }
@@ -269,71 +191,63 @@
 </style>
 
 <div class="example-wrapper">
-    <h1>CrossOver</h1>
+    <h1>🏆 Sorteos Realizados</h1>
+
     {% if app.user %}
         <div class="user-controls">
             <h2>Hola {{ app.user.username }}!</h2>
             <div class="herramientas">
                 <a href="{{ path('app_sorteo_new') }}" class="btn btn-primary">Nuevo Sorteo</a>
-                
-                <a href="{{ path('app_register') }}" class="btn btn-primary">Añadir nuevo Admin</a>
-
-                
+                <a href="{{ path('app_register') }}" class="btn btn-primary">Añadir Admin</a>
                 <a href="{{ path('app_historico') }}" class="btn btn-primary">Histórico</a>
-
             </div>
-            
         </div>
     {% endif %}
+
     <div class="contenedor">
         <div class="admin-buttons">
-            <a href="{{ path('app_main') }}" class="menu">
-                🔍Sorteos Disponibles
-            </a>
-            <a href="{{ path('app_sorteo_mostrar_pasados') }}" class="menu active">
-                🏆Sorteos Realizados
-            </a>
-        {% if app.user %}
-            <a href="{{ path('app_sorteo_mostrar_pendientes') }}" class="menu">
-                ⌚Sorteos Pendientes
-            </a>
-        {% endif %}
+            <a href="{{ path('app_main') }}" class="menu">🔍 Sorteos Disponibles</a>
+            <a href="{{ path('app_sorteo_mostrar_pasados') }}" class="menu active">🏆 Sorteos Realizados</a>
+            {% if app.user %}
+                <a href="{{ path('app_sorteo_mostrar_pendientes') }}" class="menu">⌚ Sorteos Pendientes</a>
+            {% endif %}
         </div>
     </div>
 
     {% if sorteos is empty %}
-        <p>No hay sorteos disponibles por ahora.</p>
+        <p style="text-align:center; background-color:#fff3e0; padding:12px; border-radius:8px; color:#e65100; font-weight:500;">
+            No hay sorteos realizados todavía.
+        </p>
     {% else %}
-       <ul class="sorteo-list">
-{% for sorteo in sorteos %}
-    <li>
-    {% if sorteo.imagen is not empty %}
-        <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="sorteo-imagen">
+        <ul class="sorteo-list">
+            {% for sorteo in sorteos %}
+                <li>
+                    {% if sorteo.imagen is not empty %}
+                        <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="sorteo-imagen">
+                    {% endif %}
+
+                    <h4>{{ sorteo.nombreActividad }}</h4>
+
+                    {% if sorteo.descripcion %}
+                        <div class="sorteo-desc">{{ sorteo.descripcion }}</div>
+                    {% endif %}
+
+                    <div class="sorteo-meta">
+                        <span class="meta-item meta-date"><strong>Fecha:</strong> {{ sorteo.fecha|date('d/m/Y H:i') }}</span>
+                        <span class="meta-item meta-place"><strong>Lugar:</strong> {{ sorteo.lugar }}</span>
+                        {% if sorteo.participantesIlimitados %}
+                            <span class="meta-item meta-participants"><strong>Participantes:</strong> Ilimitados</span>
+                        {% else %}
+                            <span class="meta-item meta-participants"><strong>Máx:</strong> {{ sorteo.maxParticipantes }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="sorteo-actions">
+                        <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Sorteo</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
     {% endif %}
-    <h4>{{ sorteo.nombreActividad }}</h4>
-
-    {% if sorteo.descripcion %}
-        <div class="sorteo-desc">{{ sorteo.descripcion }}</div>
-    {% endif %}
-
-    <div class="sorteo-meta">
-        <span class="meta-item meta-date"><strong>Fecha:</strong> {{ sorteo.fecha|date('d/m/Y H:i') }}</span>
-        <span class="meta-item meta-place"><strong>Lugar:</strong> {{ sorteo.lugar }}</span>
-        {% if sorteo.participantesIlimitados %}
-            <span class="meta-item meta-participants"><strong>Participantes:</strong> Ilimitados</span>
-        {% else %}
-            <span class="meta-item meta-participants"><strong>Máx participantes:</strong> {{ sorteo.maxParticipantes }}</span>
-            <span class="meta-item meta-participants"><strong>Plazas restantes:</strong> {{ sorteo.getPlazasRestantes() }}</span>
-        {% endif %}
-    </div>
-
-    <div class="sorteo-actions">
-        <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver Sorteo</a>
-        
-    </div>
-    </li>
-{% endfor %}
-</ul>
-    {% endif %}
-
+</div>
 {% endblock %}

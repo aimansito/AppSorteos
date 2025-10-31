@@ -5,50 +5,75 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        body {
+            background-color: #f5f7fa;
+        }
+
         .raffle-detail-container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 30px;
+            max-width: 950px;
+            margin: 50px auto;
+            padding: 35px;
             background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        .raffle-detail-container h1 {
+            text-align: center;
+            color: #3f51b5;
+            font-weight: 600;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #ff9800;
+            padding-bottom: 10px;
         }
 
         .raffle-subtitle {
-            color: #007bff; /* Azul claro para subtítulos */
-            border-bottom: 2px solid #a0c0ff; /* Línea azul debajo del subtítulo */
-            padding-bottom: 5px;
+            color: #3f51b5;
+            border-bottom: 2px solid #a0c0ff;
+            padding-bottom: 6px;
             margin-top: 30px;
             margin-bottom: 15px;
+            font-weight: 500;
         }
 
         .raffle-info p {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             margin-bottom: 8px;
         }
 
         .btn-sortear {
-            background-color: #28a745; 
-            border-color: #28a745;
-            font-size: 1.3rem;
-            padding: 12px 28px;
-            margin: 0 0 12px 0;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1.2rem;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
         }
-        
-        .btn-sortear:hover,
-        .btn-sortear:focus,
-        .btn-sortear:active {
-            background-color: #1e7e34 !important; 
-            border-color: #1e7e34 !important;
-            box-shadow: none;
+
+        .btn-sortear:hover {
+            background-color: #43A047;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #757575;
+            color: white;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #616161;
+            transform: translateY(-1px);
         }
 
         .winner-tag {
-            color: #d9534f; 
-            font-weight: bold;
-            background-color: #fde8e8;
-            padding: 2px 8px;
-            border-radius: 4px;
+            color: #d32f2f;
+            font-weight: 600;
+            background-color: #fdeaea;
+            padding: 3px 10px;
+            border-radius: 5px;
         }
 
         .sorteo-list {
@@ -65,36 +90,60 @@
             padding: 20px;
             border-radius: 8px;
             border-left: 5px solid #3f51b5;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s;
-            position: relative;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .sorteo-list li:hover {
+            transform: translateY(-2px);
         }
 
         .sorteo-meta {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-bottom: 10px;
+            margin-top: 10px;
         }
 
         .meta-item {
-            padding: 6px 10px;
+            padding: 5px 10px;
             border-radius: 6px;
-            font-size: 0.92em;
-            border: 1px solid transparent;
+            font-size: 0.95em;
+            background: #eef1f8;
         }
 
         .action-buttons {
             margin-top: 40px;
             border-top: 1px solid #ddd;
-            padding-top: 20px;
+            padding-top: 25px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             text-align: center;
         }
-        .action-buttons form { display: inline-block; }
+
+        .table thead th {
+            background-color: #f3f5ff;
+            color: #3f51b5;
+        }
+
+        @media (max-width: 768px) {
+            .raffle-detail-container {
+                padding: 25px 20px;
+                margin: 25px 15px;
+            }
+
+            .table-responsive {
+                font-size: 0.9rem;
+            }
+
+            .btn-sortear, .btn-secondary {
+                width: 100%;
+                padding: 14px;
+                font-size: 1rem;
+            }
+        }
     </style>
 {% endblock %}
 
@@ -105,16 +154,18 @@
     <div class="raffle-detail-container">
 
         {% if sorteo.imagen is not empty %}
-            <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="sorteo-imagen">
+            <img src="{{ asset('uploads/sorteos/' ~ sorteo.imagen) }}" alt="Imagen del sorteo {{ sorteo.nombreActividad }}" class="img-fluid rounded mb-4">
         {% endif %}
-        <h1>Detalles del Sorteo</h1>
+
+        <h1>{{ sorteo.nombreActividad }}</h1>
+
         {% if sorteo.descripcion %}
-            <p>{{ sorteo.descripcion }}</p>
+            <p class="text-muted">{{ sorteo.descripcion }}</p>
         {% endif %}
         <hr>
 
         <div class="raffle-info mb-4">
-            <h2 class="raffle-subtitle">Sorteo: {{ sorteo.nombreActividad }}</h2>
+            <h2 class="raffle-subtitle">Información general</h2>
             <p><strong>Fecha:</strong> {{ sorteo.fecha|date('d/m/Y H:i') }}</p>
             <p><strong>Lugar:</strong> {{ sorteo.lugar }}</p>
             {% if sorteo.participantesIlimitados %}
@@ -123,7 +174,6 @@
                 <p><strong>Máx participantes:</strong> {{ sorteo.maxParticipantes }}</p>
             {% endif %}
             <p><strong>Número de ganadores:</strong> {{ sorteo.numeroGanadores }}</p>
-
         </div>
 
         {% if is_granted('ROLE_ADMIN') %}
@@ -177,32 +227,37 @@
                     </table>
                 </div>
             {% endif %}
+
             <div class="action-buttons">
                 {% if not yaSorteado %}
                     <form method="POST" action="{{ path('app_sorteo_sortear', {'id': sorteo.id}) }}">
                         <input type="hidden" name="_token" value="{{ csrf_token('sortear' ~ sorteo.id) }}">
-                        <button type="submit" class="btn btn-lg btn-sortear text-white">Sortear</button>
+                        <button type="submit" class="btn btn-sortear btn-lg">🎲 Sortear</button>
                     </form>
                 {% endif %}
                 <a href="{{ path('app_main') }}" class="btn btn-secondary btn-lg">
                     Volver al Listado
                 </a>
             </div>
+
         {% else %}
-            <ul class="sorteo-list">
-            {% for participante in participantesOrdenados %}
-                {% if participante.esGanador %}
-                <li>
-                    <h4>{{ participante.puesto ?? '1' }}º</h4>
-                    <div class="sorteo-meta">
-                        <span class="meta-item"><strong>Código de entrada:</strong> {{ participante.codigoEntrada }}</span>
-                        <br>
-                        <span class="meta-item"><strong>Iniciales:</strong> {{ participante.setIniciales }}</span>
-                    </div>
-                </li>
-                {% endif %}
-            {% endfor %}
-            </ul>
+            <h3 class="raffle-subtitle">Ganadores</h3>
+            {% if participantesOrdenados|filter(p => p.esGanador)|length == 0 %}
+                <p class="alert alert-warning">Aún no hay ganadores definidos.</p>
+            {% else %}
+                <ul class="sorteo-list">
+                    {% for participante in participantesOrdenados if participante.esGanador %}
+                        <li>
+                            <h4>{{ participante.puesto ?? '1' }}º Puesto</h4>
+                            <div class="sorteo-meta">
+                                <span class="meta-item"><strong>Código de entrada:</strong> {{ participante.codigoEntrada }}</span>
+                                <span class="meta-item"><strong>Iniciales:</strong> {{ participante.setIniciales }}</span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             <div class="action-buttons">
                 <a href="{{ path('app_main') }}" class="btn btn-secondary btn-lg">
                     Volver al Listado

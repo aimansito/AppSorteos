@@ -1,64 +1,164 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in{% endblock %}
+{% block title %}Iniciar sesión{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        .full-width-form-container {
-            max-width: 800px;
-            margin: 40px auto; 
-            padding: 20px;
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
-            
+
+        .login-container {
+            max-width: 450px;
+            margin: 60px auto;
+            background: #ffffff;
+            padding: 40px 35px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #3f51b5;
+            font-weight: 500;
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-weight: 500;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .form-control {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 1rem;
+            width: 100%;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #3f51b5;
+            box-shadow: 0 0 4px rgba(63, 81, 181, 0.3);
+            outline: none;
+        }
+
+        .alert {
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 15px;
+        }
+
+        .alert-danger {
+            background-color: #fdecea;
+            color: #d32f2f;
+            border: 1px solid #f5c2c7;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
         .form-check-input {
-            width: 1.25em;
-            height: 1.25em;
-            margin-right: 0.5rem;
+            width: 1.2em;
+            height: 1.2em;
+            margin-right: 8px;
         }
-        
+
         .form-check-label {
-            padding-top: 2px;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        button.btn-primary {
+            background-color: #3f51b5;
+            border: none;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
             font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        button.btn-primary:hover {
+            background-color: #303f9f;
+            transform: translateY(-2px);
+        }
+
+        .logged-in {
+            text-align: center;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .logged-in a {
+            color: #2e7d32;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 25px 20px;
+                margin: 40px 15px;
+            }
+
+            button.btn-primary {
+                font-size: 1rem;
+            }
         }
     </style>
 {% endblock %}
 
 {% block body %}
-<div class="full-width-form-container">
-
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
-
-    {% if app.user %}
-        <div class="mb-3">
-            Ya estás logueado como {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Cerrar sesión</a>
-        </div>
-    {% endif %}
-        <h1 class="h3 mb-3 font-weight-normal">Por favor, inicia sesión</h1>
-        <label for="inputUsername">Nombre de usuario</label>
-        <input type="text" value="{{ last_username }}" name="username" id="inputUsername" class="form-control" autocomplete="username" required autofocus>
-        <label for="inputPassword">Contraseña</label>
-        <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-
-    <input type="hidden" name="_csrf_token" data-controller="csrf-protection"
-        value="{{ csrf_token('authenticate') }}"
-    >
-
-        <div class="mb-3 mt-3"> 
-            <div class="form-check">
-                <input type="checkbox" name="_remember_me" id="remember_me_input" class="form-check-input"> 
-                <label class="form-check-label" for="remember_me_input"> 
-                    Recuérdame
-                </label>
+<div class="login-container">
+    <form method="post">
+        {% if error %}
+            <div class="alert alert-danger">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
             </div>
-        </div>
+        {% endif %}
 
-        <button class="btn btn-lg btn-primary" type="submit">
-            Iniciar sesión
-        </button>
+        {% if app.user %}
+            <div class="logged-in">
+                Ya estás logueado como <strong>{{ app.user.userIdentifier }}</strong>.<br>
+                <a href="{{ path('app_logout') }}">Cerrar sesión</a>
+            </div>
+        {% else %}
+            <h1>Iniciar sesión</h1>
+
+            <label for="inputUsername">Nombre de usuario</label>
+            <input type="text" value="{{ last_username }}" name="username" id="inputUsername"
+                   class="form-control" autocomplete="username" required autofocus>
+
+            <label for="inputPassword">Contraseña</label>
+            <input type="password" name="password" id="inputPassword"
+                   class="form-control" autocomplete="current-password" required>
+
+            <input type="hidden" name="_csrf_token"
+                   value="{{ csrf_token('authenticate') }}">
+
+            <div class="form-check">
+                <input type="checkbox" name="_remember_me" id="remember_me_input" class="form-check-input">
+                <label class="form-check-label" for="remember_me_input">Recuérdame</label>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Entrar</button>
+        {% endif %}
     </form>
-    </div>
+</div>
 {% endblock %}

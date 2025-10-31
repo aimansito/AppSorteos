@@ -1,65 +1,170 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Histórico de Sorteos{% endblock %}
+{% block title %}Histórico de Sorteos - CrossOver{% endblock %}
 
 {% block body %}
-    <style>
-        .btn {
-            display: inline-block;
-            padding: 8px 16px;
-            margin-right: 5px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
-            border: none;
-            text-align: center;
-            line-height: 1.5;
+<style>
+    .example-wrapper {
+        margin: 2em auto;
+        max-width: 1200px;
+        width: 95%;
+        font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-sizing: border-box;
+    }
+
+    h1 {
+        color: #3f51b5;
+        border-bottom: 3px solid #ff9800;
+        padding-bottom: 10px;
+        margin-bottom: 25px;
+        font-size: 2em;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    .historico-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .historico-card {
+        background: #f7f9fc;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 5px solid #3f51b5;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .historico-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .historico-card h3 {
+        font-size: 1.2em;
+        color: #3f51b5;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .historico-meta {
+        margin-bottom: 10px;
+        font-size: 0.95em;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .meta-item {
+        background-color: #e3f2fd;
+        color: #0d47a1;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid #90caf9;
+        width: 100%;
+        max-width: 300px;
+        box-sizing: border-box;
+    }
+
+    .meta-winner {
+        background-color: #e8f5e9;
+        color: #1b5e20;
+        border-color: #a5d6a7;
+    }
+
+    .meta-email {
+        background-color: #fff8e1;
+        color: #6d4c41;
+        border-color: #ffe082;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+        border: none;
+        text-align: center;
+        line-height: 1.5;
+        background-color: #3f51b5;
+        color: white;
+    }
+
+    .btn:hover {
+        background-color: #303f9f;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-container {
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    @media (max-width: 600px) {
+        .example-wrapper {
+            padding: 15px;
         }
 
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        h1 {
+            font-size: 1.6em;
         }
 
-        .btn-outline-secondary {
-            background-color: #757575;
-            color: white;
+        .meta-item {
+            font-size: 0.9em;
+            padding: 6px 10px;
         }
 
-        .btn-outline-secondary:hover {
-            background-color: #616161;
+        .historico-card h3 {
+            font-size: 1.1em;
         }
-    </style>
-    <h1>Histórico de Sorteos Realizados</h1>
+    }
+</style>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Sorteo</th>
-                <th>Ganador</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for historico in historicos %}
-            <tr>
-                <td>{{ historico.fecha ? historico.fecha|date('Y-m-d H:i:s') : '' }}</td>
-                
-                <td>{{ historico.sorteo.nombreActividad ?? historico.nombreActividad }}</td> 
-                
-                <td>{{ historico.ganador.nombre ?? 'N/A' }} ({{ historico.ganador.email ?? 'N/A' }})</td> 
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">No hay registros históricos.</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="example-wrapper">
+    <h1>🏆 Histórico de Sorteos</h1>
 
-    <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
-        Volver al Listado
-    </a>
+    {% if historicos is empty %}
+        <p style="text-align:center; background-color:#fff3e0; padding:12px; border-radius:8px; color:#e65100; font-weight:500;">
+            No hay registros históricos por ahora.
+        </p>
+    {% else %}
+        <ul class="historico-list">
+            {% for historico in historicos %}
+                <li class="historico-card">
+                    <h3>{{ historico.sorteo.nombreActividad ?? historico.nombreActividad }}</h3>
+                    <div class="historico-meta">
+                        <span class="meta-item"><strong>Fecha:</strong> {{ historico.fecha ? historico.fecha|date('d/m/Y H:i') : '' }}</span>
+                        <span class="meta-item meta-winner"><strong>Ganador:</strong> {{ historico.ganador.nombre ?? 'N/A' }}</span>
+                        <span class="meta-item meta-email"><strong>Email:</strong> {{ historico.ganador.email ?? 'N/A' }}</span>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="btn-container">
+        <a href="{{ path('app_main') }}" class="btn">⬅ Volver al Listado</a>
+    </div>
+</div>
 {% endblock %}

@@ -1,43 +1,133 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Participante{% endblock %}
+{% block title %}Participantes{% endblock %}
 
 {% block body %}
-    <style>
-        .a-last-child {
-            display: inline-block;
-            padding: 8px 16px;
-            margin-right: 5px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
-            border: none;
+<style>
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+        color: #3f51b5;
+        font-weight: 500;
+        margin-bottom: 25px;
+    }
+
+    .table-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 25px 30px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    thead {
+        background-color: #3f51b5;
+        color: white;
+    }
+
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    tbody tr:hover {
+        background-color: #f1f3f6;
+    }
+
+    td:last-child {
+        text-align: center;
+    }
+
+    a.btn {
+        display: inline-block;
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin: 2px;
+        font-size: 0.95rem;
+    }
+
+    .btn-show {
+        background-color: #2196f3;
+        color: white;
+    }
+
+    .btn-show:hover {
+        background-color: #1976d2;
+    }
+
+    .btn-edit {
+        background-color: #ff9800;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background-color: #f57c00;
+    }
+
+    .btn-create {
+        display: block;
+        width: fit-content;
+        margin: 25px auto 10px;
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .btn-create:hover {
+        background-color: #388e3c;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        th, td {
+            font-size: 0.9rem;
+            padding: 10px;
+        }
+
+        .table-container {
+            padding: 15px;
+        }
+
+        .btn-create {
+            width: 100%;
             text-align: center;
-            line-height: 1.5;
-            background-color: #3f51b5;
-            color: white;
         }
+    }
+</style>
 
-        .a-last-child:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);   
-            background-color: #303f9f;
-        }
-    </style>
-
-    <h1>Participante</h1>
+<div class="table-container">
+    <h1>Lista de Participantes</h1>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                <th>ID</th>
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>Código de Entrada</th>
                 <th>Ganador</th>
-                <th></th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -47,19 +137,26 @@
                 <td>{{ participante.nombre }}</td>
                 <td>{{ participante.email }}</td>
                 <td>{{ participante.codigoEntrada }}</td>
-                <td>{{ participante.esGanador ? 'Sí' : 'No' }}</td>
                 <td>
-                    <a href="{{ path('app_participante_show', {'id': participante.id}) }}">Mostrar</a>
-                    <a href="{{ path('app_participante_edit', {'id': participante.id}) }}">Editar</a>
+                    {% if participante.esGanador %}
+                        🏆 <strong style="color:#388e3c;">Sí</strong>
+                    {% else %}
+                        ❌ <span style="color:#c62828;">No</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('app_participante_show', {'id': participante.id}) }}" class="btn btn-show">Ver</a>
+                    <a href="{{ path('app_participante_edit', {'id': participante.id}) }}" class="btn btn-edit">Editar</a>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">No hay datos disponibles</td>
+                <td colspan="6" style="text-align:center; color:#777;">No hay datos disponibles</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
-    <a href="{{ path('app_participante_new') }}" class="a-last-child">Crear Usuario</a>
+    <a href="{{ path('app_participante_new') }}" class="btn-create">➕ Crear nuevo participante</a>
+</div>
 {% endblock %}

@@ -1,75 +1,172 @@
 {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
 
-    <div class="mb-3">
-        {{ form_row(form.nombre, {
-            'attr': {'class': 'form-control form-control-lg form-control-yellow'}
-        }) }}
-    </div>
+<style>
+    form {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 25px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
 
-    <div class="mb-3">
-        {{ form_row(form.email, {
-            'attr': {'class': 'form-control form-control-lg form-control-yellow'}
-        }) }}
-    </div>
+    .mb-3 {
+        margin-bottom: 1.2rem;
+    }
 
-    <div class="mb-3">
-        {{ form_row(form.codigoEntrada, {
-            'attr': {'class': 'form-control form-control-lg form-control-yellow', 'id': 'codigoEntrada'}
-        }) }}
-        <div id="codigo-error" class="text-danger" style="display: none;"></div>
-    </div>
+    label {
+        font-weight: 500;
+        color: #3f51b5;
+    }
 
-    {# Casilla de aceptación de términos (solo si el campo existe en el formulario) #}
-    {% if form.aceptarTerminos is defined %}
-        {{ form_row(form.aceptarTerminos) }}
-    {% endif %}
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const codigoInput = document.getElementById('codigoEntrada');
-            const codigoError = document.getElementById('codigo-error');
-            const form = document.querySelector('form');
-            
-            // Validación en tiempo real
-            codigoInput.addEventListener('blur', function() {
-                const codigo = this.value.trim();
-                if (codigo) {
-                    // Aquí podrías agregar una llamada AJAX para verificar en tiempo real
-                    // Por ahora solo validamos que no esté vacío
-                    if (codigo.length < 2) {
-                        codigoError.textContent = 'El código debe tener al menos 2 caracteres';
-                        codigoError.style.display = 'block';
-                    } else {
-                        codigoError.style.display = 'none';
-                    }
-                }
-            });
-            
-            // Validación antes de enviar el formulario
-            form.addEventListener('submit', function(e) {
-                const codigo = codigoInput.value.trim();
-                if (!codigo) {
-                    e.preventDefault();
-                    alert('Por favor, ingresa un código de entrada');
-                    codigoInput.focus();
-                } else if (codigo.length < 2) {
-                    e.preventDefault();
-                    codigoError.textContent = 'El código debe tener al menos 2 caracteres';
-                    codigoError.style.display = 'block';
-                    codigoInput.focus();
-                }
-            });
+    .form-control {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 1rem;
+        width: 100%;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #3f51b5;
+        box-shadow: 0 0 4px rgba(63, 81, 181, 0.3);
+        outline: none;
+    }
+
+    .form-control-yellow {
+        background-color: #fffdf5;
+    }
+
+    .text-danger {
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+
+    /* Botones */
+    .form-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 25px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 18px;
+        border-radius: 6px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .btn-success {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background-color: #43A047;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline-secondary {
+        background-color: #f5f5f5;
+        color: #333;
+        border: 1px solid #ccc;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #e0e0e0;
+        transform: translateY(-2px);
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+        form {
+            padding: 20px;
+        }
+
+        .btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        .form-buttons {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+</style>
+
+<div class="mb-3">
+    {{ form_row(form.nombre, {
+        'attr': {'class': 'form-control form-control-lg form-control-yellow'}
+    }) }}
+</div>
+
+<div class="mb-3">
+    {{ form_row(form.email, {
+        'attr': {'class': 'form-control form-control-lg form-control-yellow'}
+    }) }}
+</div>
+
+<div class="mb-3">
+    {{ form_row(form.codigoEntrada, {
+        'attr': {'class': 'form-control form-control-lg form-control-yellow', 'id': 'codigoEntrada'}
+    }) }}
+    <div id="codigo-error" class="text-danger" style="display: none;"></div>
+</div>
+
+{% if form.aceptarTerminos is defined %}
+    {{ form_row(form.aceptarTerminos) }}
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const codigoInput = document.getElementById('codigoEntrada');
+        const codigoError = document.getElementById('codigo-error');
+        const form = document.querySelector('form');
+
+        codigoInput.addEventListener('blur', function() {
+            const codigo = this.value.trim();
+            if (codigo && codigo.length < 2) {
+                codigoError.textContent = 'El código debe tener al menos 2 caracteres';
+                codigoError.style.display = 'block';
+            } else {
+                codigoError.style.display = 'none';
+            }
         });
-    </script>
 
-    <div class="d-flex justify-content-center gap-3 mt-4"> 
-        <button type="submit" class="btn btn-success">
-            {{ button_label|default('Apuntarse') }}
-        </button>
+        form.addEventListener('submit', function(e) {
+            const codigo = codigoInput.value.trim();
+            if (!codigo) {
+                e.preventDefault();
+                alert('Por favor, ingresa un código de entrada');
+                codigoInput.focus();
+            } else if (codigo.length < 2) {
+                e.preventDefault();
+                codigoError.textContent = 'El código debe tener al menos 2 caracteres';
+                codigoError.style.display = 'block';
+                codigoInput.focus();
+            }
+        });
+    });
+</script>
 
-        <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
-            Volver al Listado
-        </a>
-    </div>
+<div class="form-buttons">
+    <button type="submit" class="btn btn-success">
+        {{ button_label|default('Apuntarse') }}
+    </button>
+
+    <a href="{{ path('app_main') }}" class="btn btn-outline-secondary">
+        Volver al Listado
+    </a>
+</div>
 
 {{ form_end(form) }}
