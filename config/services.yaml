@@ -1,3 +1,4 @@
+## Servicios y parámetros de la aplicación (autowire/autoconfigure activos)
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
 

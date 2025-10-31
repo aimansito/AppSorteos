@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
+ * Repositorio de Participante: utilidades de búsqueda y validación por sorteo.
  * @extends ServiceEntityRepository<Participante>
  */
 class ParticipanteRepository extends ServiceEntityRepository

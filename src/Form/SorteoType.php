@@ -14,6 +14,14 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 
+/**
+ * Formulario de administración de sorteos.
+ * Define los campos principales del sorteo y reglas de validación.
+ *
+ * Notas:
+ * - imagenFile: campo no mapeado, restringido a JPG/PNG y tamaño máximo.
+ * - participantesIlimitados: controla el uso de maxParticipantes.
+ */
 class SorteoType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

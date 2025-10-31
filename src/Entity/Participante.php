@@ -8,6 +8,15 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Entity\Sorteo;
 
+/**
+ * Entidad Participante
+ * Guarda los datos de cada persona apuntada a un sorteo.
+ * Campos clave:
+ * - nombre y email: identificación básica (email validado y único por sorteo)
+ * - codigoEntrada: código que trae el participante
+ * - esGanador/puesto: marca si ganó y su orden
+ * - sorteo: relación N:1 con Sorteo
+ */
 #[ORM\Entity(repositoryClass: ParticipanteRepository::class)]
 #[UniqueEntity(
     fields: ['sorteo', 'email'],

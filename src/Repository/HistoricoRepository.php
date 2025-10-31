@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
+ * Repositorio de Histórico: acceso a registros de resultados de sorteos.
  * @extends ServiceEntityRepository<Historico>
  */
 class HistoricoRepository extends ServiceEntityRepository

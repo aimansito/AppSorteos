@@ -15,12 +15,17 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Controlador de registro de Admins.
+ * Permite crear usuarios administradores que gestionarán los sorteos.
+ */
 class RegistrationController extends AbstractController
 {
     #[Route('/register', name: 'app_register')]
     #[IsGranted('ROLE_ADMIN')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
+        // Creamos un usuario nuevo a partir del formulario
         $user = new User();
 
         // $project = new Project();
@@ -35,6 +40,7 @@ class RegistrationController extends AbstractController
             // encode the plain password
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
+            // Este registro crea usuarios con rol de admin
             $user->setRoles(['ROLE_ADMIN']);
 
 

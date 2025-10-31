@@ -1,3 +1,4 @@
+## Rutas por atributos: carga automática de controladores en src/Controller
 controllers:
     resource:
         path: ../src/Controller/

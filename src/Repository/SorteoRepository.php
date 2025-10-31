@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
+ * Repositorio de Sorteo: consultas de activos, inactivos y pendientes.
  * @extends ServiceEntityRepository<Sorteo>
  */
 class SorteoRepository extends ServiceEntityRepository

@@ -11,6 +11,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
 
+/**
+ * Formulario público de inscripción a sorteo.
+ * Incluye aceptación de términos (campo no mapeado) con validación obligatoria.
+ * Pensado para uso en la página pública de apuntarse.
+ */
 class ParticipantePublicType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

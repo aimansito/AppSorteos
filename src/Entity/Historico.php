@@ -7,6 +7,15 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Participante;
 use App\Entity\Sorteo;
 
+/**
+ * Entidad Histórico
+ * Registra los resultados de un sorteo: ganador/es y puesto.
+ * Campos:
+ * - nombreActividad, fecha: referencia temporal
+ * - ganador: Participante vencedor
+ * - sorteo: referencia al sorteo original
+ * - puesto: posición del ganador cuando hay varios
+ */
 #[ORM\Entity(repositoryClass: HistoricoRepository::class)]
 class Historico
 {

@@ -1,3 +1,4 @@
+## Configuración de seguridad: hash de contraseñas, proveedor de usuarios y firewall principal
 security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:

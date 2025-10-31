@@ -8,6 +8,14 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Entidad User
+ * Usuarios del sistema (admins incluidos).
+ * Campos:
+ * - username: identificador único
+ * - roles: lista de roles (añadimos ROLE_ADMIN en el registro de admins)
+ * - password: hash de la contraseña
+ */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 #[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]

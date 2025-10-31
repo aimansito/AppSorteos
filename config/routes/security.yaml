@@ -1,3 +1,4 @@
+## Ruta de logout: proporcionada por el cargador de rutas de seguridad
 _security_logout:
     resource: security.route_loader.logout
     type: service

@@ -16,6 +16,11 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
+/**
+ * Autenticador de formulario de inicio de sesión.
+ * Lee `username` y `password` del request, valida CSRF y recuerda sesión.
+ * Tras autenticación exitosa, redirige a `app_main` o a la ruta objetivo previa.
+ */
 class LoginAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;

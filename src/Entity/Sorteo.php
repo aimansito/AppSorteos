@@ -11,6 +11,18 @@ use App\Entity\Participante;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * Entidad Sorteo
+ * Representa una actividad a sortear con fecha, lugar y reglas básicas.
+ * Campos clave:
+ * - nombreActividad: título del sorteo
+ * - fecha/lugar: cuándo y dónde
+ * - maxParticipantes / participantesIlimitados: control del aforo
+ * - imagen/descripcion: datos visuales y texto
+ * - activo: visible (true) u oculto (false)
+ * - numeroGanadores: cuántos ganadores se eligen
+ * - participantes: relación 1:N con Participante
+ */
 #[ORM\Entity(repositoryClass: SorteoRepository::class)]
 class Sorteo
 {

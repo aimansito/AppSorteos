@@ -9,6 +9,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
+/**
+ * Formulario interno para gestionar datos básicos del participante.
+ * Incluye nombre, email y código de entrada.
+ */
 class ParticipanteType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

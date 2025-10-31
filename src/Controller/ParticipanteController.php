@@ -13,6 +13,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Controlador de Participantes (solo admins).
+ * Permite listar, crear, ver y editar participantes.
+ * Útil para gestionar registros y corregir datos.
+ */
 #[Route('/participante')]
 #[IsGranted('ROLE_ADMIN')]
 final class ParticipanteController extends AbstractController
@@ -20,6 +25,7 @@ final class ParticipanteController extends AbstractController
     #[Route(name: 'app_participante_index', methods: ['GET'])]
     public function index(ParticipanteRepository $participanteRepository): Response
     {
+        // Vista de tabla con todos los participantes registrados
         return $this->render('participante/index.html.twig', [
             'participantes' => $participanteRepository->findAll(),
         ]);
@@ -29,12 +35,14 @@ final class ParticipanteController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        // Alta manual de participante (modo admin)
         $participante = new Participante();
         $form = $this->createForm(ParticipanteType::class, $participante);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                // Guardamos el registro nuevo
                 $entityManager->persist($participante);
                 $entityManager->flush();
 
@@ -55,6 +63,7 @@ final class ParticipanteController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function show(Participante $participante): Response
     {
+        // Detalle de un participante
         return $this->render('participante/show.html.twig', [
             'participante' => $participante,
         ]);
@@ -64,6 +73,7 @@ final class ParticipanteController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, Participante $participante, EntityManagerInterface $entityManager): Response
     {
+        // Edición de datos del participante
         $form = $this->createForm(ParticipanteType::class, $participante);
         $form->handleRequest($request);
 

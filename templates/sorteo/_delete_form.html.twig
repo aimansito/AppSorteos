@@ -1,3 +1,4 @@
+{# Formulario parcial para borrar un sorteo con protección CSRF y confirmación #}
 <form method="post" action="{{ path('app_sorteo_delete', {'id': sorteo.id}) }}" onsubmit="return confirm('¿Estás seguro de que quieres borrar este sorteo?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sorteo.id) }}">
     <button class="btn">Borrar</button>

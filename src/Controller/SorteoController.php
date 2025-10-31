@@ -23,6 +23,13 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
+/**
+ * Controlador de Sorteos.
+ * Gestiona el ciclo de vida de un sorteo: listar, crear/editar,
+ * ocultar/restaurar, apuntarse y realizar el sorteo.
+ *
+ * Comentarios en español para entender rápido qué hace cada parte.
+ */
 #[Route('/sorteo')]
 class SorteoController extends AbstractController
 {
@@ -34,6 +41,7 @@ class SorteoController extends AbstractController
     #[Route(name: 'app_sorteo_index', methods: ['GET'])]
     public function index(SorteoRepository $sorteoRepository): Response
     {
+        // Listado general de sorteos (vista administrativa)
         return $this->render('sorteo/index.html.twig', [
             'sorteos' => $sorteoRepository->findAll(),
         ]);
@@ -101,6 +109,7 @@ class SorteoController extends AbstractController
                 $sorteo->setImagen($archivoNuevo);
             }
             
+            // Guardamos el sorteo y notificamos
             $em->persist($sorteo);
             $em->flush();
             $this->addFlash('success', 'Sorteo creado correctamente.');
@@ -167,6 +176,7 @@ class SorteoController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
     {
+        // En lugar de eliminar de la base de datos, lo marcamos como inactivo
         if ($this->isCsrfTokenValid('delete' . $sorteo->getId(), $request->request->get('_token'))) {
             // Cambiar el estado a false en lugar de eliminar
             $sorteo->setActivo(false);
@@ -257,6 +267,7 @@ class SorteoController extends AbstractController
         $numeroGanadores = min($numeroGanadores, $totalParticipantes);
 
         // Mezclar participantes y tomar los primeros N
+        // Mezclamos los participantes para que el sorteo sea aleatorio
         shuffle($participantes);
         $ganadores = array_slice($participantes, 0, $numeroGanadores);
 
@@ -364,6 +375,7 @@ class SorteoController extends AbstractController
     #[IsGranted('ROLE_ADMIN')]
     public function restaurar(Request $request, Sorteo $sorteo, EntityManagerInterface $em): Response
     {
+        // Re-activamos el sorteo que estaba oculto
         if ($this->isCsrfTokenValid('restaurar' . $sorteo->getId(), $request->request->get('_token'))) {
             // Restaurar el sorteo cambiando el estado a true
             $sorteo->setActivo(true);
