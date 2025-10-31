@@ -128,6 +128,13 @@
             color: #3f51b5;
         }
 
+        .img-fluid {
+            max-width: 200px;
+            height: auto;
+            display:flex;
+            margin: 0 auto;
+        }
+
         @media (max-width: 768px) {
             .raffle-detail-container {
                 padding: 25px 20px;
@@ -246,7 +253,8 @@
                 <p class="alert alert-warning">Aún no hay ganadores definidos.</p>
             {% else %}
                 <ul class="sorteo-list">
-                    {% for participante in participantesOrdenados if participante.esGanador %}
+                    {% for participante in participantesOrdenados %}
+                        {%if participante.esGanador %} 
                         <li>
                             <h4>{{ participante.puesto ?? '1' }}º Puesto</h4>
                             <div class="sorteo-meta">
@@ -254,6 +262,7 @@
                                 <span class="meta-item"><strong>Iniciales:</strong> {{ participante.setIniciales }}</span>
                             </div>
                         </li>
+                        {%endif%}
                     {% endfor %}
                 </ul>
             {% endif %}

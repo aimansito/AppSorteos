@@ -267,7 +267,7 @@
                         {% else %}
                             <h3 style="color: red;">Completo</h3>
                         {% endif %}
-                        <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver</a>
+                        <a href="{{ path('app_sorteo_show', {'id': sorteo.id}) }}" class="btn btn-info">Ver sorteo</a>
                     </div>
 
                     {% if is_granted('ROLE_ADMIN') %}
